@@ -39,8 +39,12 @@ local Commands = {
             ):send();
         end,
         openimport = function()
-            local f = Regrowth.Frames:CreateImportFrame()
-            if f:IsShown() then f:Hide() else f:Show() f.EditBox:SetFocus() end
+            if Regrowth.Frames.ImportFrame:IsShown() then
+                Regrowth.Frames.ImportFrame:Hide();
+            else
+                Regrowth.Frames.ImportFrame:Show();
+                Regrowth.Frames.ImportFrame.EditBox:SetFocus();
+            end
         end,
     }
 };
@@ -80,8 +84,6 @@ function Commands:_dispatch(str)
     local args = {};
 
     args = { strsplit(" ", argumentStr, 1) };
-
-    Regrowth:debug(command);
 
     if (command and self.Dictionary[command]and type(self.Dictionary[command]) == "function") then
         return self.Dictionary[command](unpack(args))

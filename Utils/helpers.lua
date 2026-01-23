@@ -1,6 +1,8 @@
 ---@type Regrowth
 local _, Regrowth = ...;
 
+local msgPrefix = "|cff10b981[RegrowthLootTool]|r"
+
 function Regrowth:empty(mixed)
     mixed = mixed or false;
 
@@ -141,7 +143,7 @@ function Regrowth:strStartsWith(str, startStr, insensitive)
 end
 
 function Regrowth:message(...)
-    print("|TInterface/TARGETINGFRAME/UI-RaidTargetingIcon_3:12|t|cff8aecff RegrowthLootTool : |r" .. table.concat({ ... }, " "));
+    print(msgPrefix .. " " .. table.concat({ ... }, " "));
 end
 
 function Regrowth:coloredMessage(color, ...)

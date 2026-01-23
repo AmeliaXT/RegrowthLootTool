@@ -30,6 +30,11 @@
         "SetDesaturation",
         "ColorPickerFrame",
         "OKAY",
-        "NOT_BOUND"
+        "NOT_BOUND",
+        "CommunitiesFrame",
+        "PlayerFrame"
+    ],
+    "Lua.diagnostics.disable": [
+        "assign-type-mismatch"
     ]
 }

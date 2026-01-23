@@ -24,7 +24,5 @@ function User:_init()
     self.fqn = Regrowth:getFullyQualifiedName(self.name, self.realm);
     self.isOfficer = C_GuildInfo.IsGuildOfficer();
 
-    print("Running user stuff")
-
     self._initialized = true;
 end
