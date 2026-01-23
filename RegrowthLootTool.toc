@@ -1,0 +1,30 @@
+## Interface: 20505
+## Title: Regrowth Loot Tool
+## IconTexture: Interface\AddOns\RegrowthLootTool\Icons\nex
+## Notes: Guild loot biases, attendance, and player loot history.
+## Author: Juice (Souljuice etc) / Amy (Kyukon / Khamira)
+## Version: 0.1
+## SavedVariables: Regrowth_Data, Regrowth_Recipes, Regrowth_Players
+
+# Libraries
+libraries.xml
+
+# Bootstrap
+bootstrap.lua
+
+# Data objects
+Data/Data.lua
+Data/Constants.lua
+
+# Helpers
+Utils/helpers.lua
+
+# Frame objects
+Frames/Frames.lua
+
+# Class objects
+Classes/Commands.lua
+Classes/User.lua
+Classes/Comm/Comm.lua
+Classes/Comm/Message.lua
+Classes/Comm/Actions.lua
