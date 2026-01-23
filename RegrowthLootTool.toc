@@ -19,12 +19,10 @@ Data/Constants.lua
 # Helpers
 Utils/helpers.lua
 
-# Frame objects
-Frames/Frames.lua
-
 # Class objects
 Classes/Commands.lua
 Classes/User.lua
-Classes/Comm/Comm.lua
-Classes/Comm/Message.lua
-Classes/Comm/Actions.lua
+Classes/Frames.lua
+Classes/DataSync/Comm.lua
+Classes/DataSync/Message.lua
+Classes/DataSync/Actions.lua

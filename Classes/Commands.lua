@@ -39,8 +39,12 @@ local Commands = {
             ):send();
         end,
         openimport = function()
-            local f = Regrowth.Frames:CreateImportFrame()
-            if f:IsShown() then f:Hide() else f:Show() f.EditBox:SetFocus() end
+            if Regrowth.Frames.ImportFrame:IsShown() then
+                Regrowth.Frames.ImportFrame:Hide();
+            else
+                Regrowth.Frames.ImportFrame:Show();
+                Regrowth.Frames.ImportFrame.EditBox:SetFocus();
+            end
         end,
     }
 };

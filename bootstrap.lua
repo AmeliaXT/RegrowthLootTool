@@ -14,7 +14,6 @@ Regrowth_Recipes = Regrowth_Recipes or {}
 Regrowth_Players = Regrowth_Players or {}
 
 Regrowth.name = appName;
-Regrowth.colour = "|cff10b981Regrowth|r"
 Regrowth._initialized = false;
 Regrowth.EventFrame = nil;
 
@@ -22,7 +21,8 @@ Regrowth.Ace = LibStub("AceAddon-3.0"):NewAddon(Regrowth.name, "AceConsole-3.0",
 
 function Regrowth:_init()
     -- self.DB:_init();
-    self.Commands._init();
+    self.Commands:_init();
+    self.Frames:_init();
     self.User:_init();
     self.Comm:_init();
 
@@ -42,45 +42,56 @@ function Regrowth:bootstrap(_, _, addonName)
     self.EventFrame:UnregisterEvent("ADDON_LOADED");
 
     self:_init();
+
+    Regrowth:success("Ready. Run /regrowth to start.");
+
     self._initialized = true;
 end
 
 local function ProcessItemTooltip(tooltip)
-    local _, link = tooltip:GetItem()
-    if not link then return end
+    local _, link = tooltip:GetItem();
+
+    if not link then
+        return;
+    end
 
     local itemID = C_Item.GetItemInfoInstant(link);
-    if not itemID then return end
+
+    if not itemID then
+        return;
+    end
 
     -- 1. Check Loot Priority
     if Regrowth_Data[itemID] then
-        tooltip:AddLine(" ")
-        tooltip:AddLine("Regrowth Bias:", 0.1, 1, 0.6)
-        tooltip:AddLine(Regrowth_Data[itemID], 1, 1, 1, true)
+        tooltip:AddLine(" ");
+        tooltip:AddLine("Regrowth Bias:", 0.1, 1, 0.6);
+        tooltip:AddLine(Regrowth_Data[itemID], 1, 1, 1, true);
     end
 
     -- 2. Check Recipes
     if Regrowth_Recipes[itemID] then
-        tooltip:AddLine(" ")
-        tooltip:AddLine("Known By:", 0.1, 1, 0.6)
-        tooltip:AddLine(Regrowth_Recipes[itemID], 1, 1, 1, true)
+        tooltip:AddLine(" ");
+        tooltip:AddLine("Known By:", 0.1, 1, 0.6);
+        tooltip:AddLine(Regrowth_Recipes[itemID], 1, 1, 1, true);
     end
 end
 
 local function ProcessUnitTooltip(tooltip)
-    local name, unit = tooltip:GetUnit()
+    if not IsInRaid() then
+        return;
+    end
 
-    if not IsInRaid() then return end
-    
-    local pData = Regrowth_Players[name]
-    if pData then
-        tooltip:AddLine(" ")
-        tooltip:AddLine("Guild Raid Stats:", 0.1, 1, 0.6)
-        tooltip:AddDoubleLine("Attendance:", pData.att or "N/A", 1, 1, 1, 1, 1, 1)
-        local lootCount = pData.loot or 0
-        local lastWin = pData.last or "N/A"
-        local lootText = string.format("%d Won (%s)", lootCount, lastWin)
-        tooltip:AddDoubleLine("MS Loot:", lootText, 1, 1, 1, 1, 1, 1)
+    local name = tooltip:GetUnit();
+
+    local playerData = Regrowth_Players[name]
+    if playerData then
+        tooltip:AddLine(" ");
+        tooltip:AddLine("Guild Raid Stats:", 0.1, 1, 0.6);
+        tooltip:AddDoubleLine("Attendance:", playerData.att or "N/A", 1, 1, 1, 1, 1, 1);
+        local lootCount = playerData.loot or 0;
+        local lastWin = playerData.last or "N/A";
+        local lootText = string.format("%d Won (%s)", lootCount, lastWin);
+        tooltip:AddDoubleLine("MS Loot:", lootText, 1, 1, 1, 1, 1, 1);
     end
 end
 
@@ -92,6 +103,6 @@ function Regrowth:hookPlayerTooltips()
     GameTooltip:HookScript("OnTooltipSetUnit", ProcessUnitTooltip);
 end
 
-Regrowth.EventFrame = CreateFrame("FRAME", "RegrowthLootToolsEventFrame");
+Regrowth.EventFrame = CreateFrame("FRAME", "Regrowth_EventFrame");
 Regrowth.EventFrame:RegisterEvent("ADDON_LOADED");
 Regrowth.EventFrame:SetScript("OnEvent", function (...) Regrowth:bootstrap(...); end);
