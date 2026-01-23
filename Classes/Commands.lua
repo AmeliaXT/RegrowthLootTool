@@ -85,8 +85,6 @@ function Commands:_dispatch(str)
 
     args = { strsplit(" ", argumentStr, 1) };
 
-    Regrowth:debug(command);
-
     if (command and self.Dictionary[command]and type(self.Dictionary[command]) == "function") then
         return self.Dictionary[command](unpack(args))
     end

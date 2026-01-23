@@ -114,15 +114,16 @@ function Frames:CreateImportFrame()
 end
 
 function Frames:CreateCommunitiesButtonFrame()
-    local communitiesButtonFrame = CreateFrame( "Button" , "Regrowth_CommunitiesButton" , CommunitiesFrame , "UIPanelButtonTemplate" );
+    local communitiesButtonFrame = CreateFrame( "Button" , "Regrowth_CommunitiesButton" , CommunitiesFrame.GuildInfoTab , "UIPanelButtonTemplate" );
     -- communitiesButtonFrame:Hide();
     
     communitiesButtonFrame.Text = communitiesButtonFrame:CreateFontString(nil, "OVERLAY", "GameFontWhiteTiny");
     communitiesButtonFrame.Text:SetPoint("CENTER", communitiesButtonFrame);
-    communitiesButtonFrame.Text:SetText("Clicky");
+    communitiesButtonFrame.Text:SetText("");
 
-    communitiesButtonFrame:SetSize(120, 120);
-    communitiesButtonFrame:SetPoint("RIGHT");
+    communitiesButtonFrame:SetSize(40, 40);
+    communitiesButtonFrame:SetPoint("TOP", 2, -200);
+    communitiesButtonFrame:SetNormalTexture("Interface\\AddOns\\RegrowthLootTool\\Icons\\rlt");
 
     communitiesButtonFrame:SetScript("OnClick", function (_, button)
         if button == "LeftButton" then

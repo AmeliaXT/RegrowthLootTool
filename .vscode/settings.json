@@ -31,7 +31,8 @@
         "ColorPickerFrame",
         "OKAY",
         "NOT_BOUND",
-        "CommunitiesFrame"
+        "CommunitiesFrame",
+        "PlayerFrame"
     ],
     "Lua.diagnostics.disable": [
         "assign-type-mismatch"
