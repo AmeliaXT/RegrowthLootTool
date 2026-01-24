@@ -142,6 +142,10 @@ function Regrowth:strStartsWith(str, startStr, insensitive)
     return string.sub(str, 1, string.len(startStr)) == startStr;
 end
 
+function Regrowth:isCurrentVersion()
+    return Regrowth.Data.Version.current and Regrowth.Data.Version.current == Regrowth.Data.Version.latest;
+end
+
 function Regrowth:message(...)
     print(msgPrefix .. " " .. table.concat({ ... }, " "));
 end

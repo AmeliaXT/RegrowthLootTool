@@ -1,7 +1,7 @@
 local _, Regrowth = ...;
 
----@type RegrowthConsts
-local Consts = Regrowth.Data.Constants;
+---@type RegrowthData
+local RegrowthData = Regrowth.Data;
 
 ---@class Commands
 local Commands = {
@@ -12,41 +12,33 @@ local Commands = {
     Dictionary = {
         nex = function() 
             Regrowth.Comm.Message.new(
-                Consts.Comm.Actions.nex,
+                RegrowthData.Constants.Comm.Actions.nex,
                 "Nex says hi (>^.^<)",
                 "GUILD"
             ):send();
         end,
         senddataupdate = function()
             Regrowth.Comm.Message.new(
-                Consts.Comm.Actions.updateData,
-                Regrowth_Data,
+                RegrowthData.Constants.Comm.Actions.updateData,
+                Regrowth_Item_Data,
                 "GUILD"
             ):send();
         end,
         sendplayerupdate = function()
             Regrowth.Comm.Message.new(
-                Consts.Comm.Actions.updatePlayers,
+                RegrowthData.Constants.Comm.Actions.updatePlayers,
                 Regrowth_Players,
                 "GUILD"
             ):send();
         end,
         sendrecipeupdate = function()
             Regrowth.Comm.Message.new(
-                Consts.Comm.Actions.updateRecipes,
+                RegrowthData.Constants.Comm.Actions.updateRecipes,
                 Regrowth_Recipes,
                 "GUILD"
             ):send();
         end,
-        openimport = function()
-            if Regrowth.Frames.ImportFrame:IsShown() then
-                Regrowth.Frames.ImportFrame:Hide();
-            else
-                Regrowth.Frames.ImportFrame:Show();
-                Regrowth.Frames.ImportFrame.EditBox:SetFocus();
-            end
-        end,
-    }
+    },
 };
 
 ---@type Commands

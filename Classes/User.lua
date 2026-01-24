@@ -26,3 +26,22 @@ function User:_init()
 
     self._initialized = true;
 end
+
+function User:CanSendUpdates()
+    local canUpdate = false;
+    local authorisedUsers = Regrowth.Data.Storage.AuthorisedUsers.data;
+
+    if not Regrowth:isCurrentVersion() then
+        Regrowth:warning("Can't share Regrowth_Data - Version out of date.");
+        return false;
+    end
+
+    for userName in string.gmatch(authorisedUsers, '([^,]+)') do
+        if (Regrowth:iEquals(userName, self.name)) then
+            canUpdate = true;
+            break;
+        end
+    end
+
+    return canUpdate;
+end

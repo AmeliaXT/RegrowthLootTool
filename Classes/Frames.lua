@@ -2,27 +2,148 @@
 local _, Regrowth = ...;
 
 ---@class Frames
----@field ImportFrame Frame
----@field CommunitiesUiButtonFrame Frame
+---@field UIFrame string
 local Frames = {
     _initialized = false,
+    UIFrame = "closed",
+    AuthUsers = "Amy,Juice"
 };
 
 ---@type Frames
 Regrowth.Frames = Frames;
+
+local function UpdateAuthUsers(authUsers)
+    Regrowth.Data:UpdateDataAndSave(authUsers, "AuthorisedUsers");
+end
+
+local function CreateMainMenuTab(container)
+    local desc = Regrowth.AceGUI:Create("Label");
+    desc:SetText("Main Menu");
+    desc:SetFullWidth(true);
+    container:AddChild(desc);
+
+    local button = Regrowth.AceGUI:Create("Button");
+    button:SetText("Main Menu button");
+    button:SetWidth(200);
+    container:AddChild(button);
+end
+
+local function CreateDataSyncTab(container)
+    local desc = Regrowth.AceGUI:Create("Label");
+    desc:SetText("Data Sync");
+    desc:SetFullWidth(true);
+    container:AddChild(desc);
+
+    local button = Regrowth.AceGUI:Create("Button");
+    button:SetText("Data Sync button");
+    button:SetWidth(200);
+    container:AddChild(button);
+end
+
+local function CreateAuthUsersTab(container)
+    local authUsersLbl = Regrowth.AceGUI:Create("Label");
+    authUsersLbl:SetText("Authorised Users - CSL");
+    authUsersLbl:SetFullWidth(true);
+    container:AddChild(authUsersLbl);
+
+    local authUsersEb = Regrowth.AceGUI:Create("EditBox");
+    authUsersEb:SetFullWidth(true);
+    authUsersEb:SetText(Regrowth.Data.Storage.AuthorisedUsers.data);
+    container:AddChild(authUsersEb);
+
+    local authUsersBtn = Regrowth.AceGUI:Create("Button");
+    authUsersBtn:SetText("Save");
+    authUsersBtn:SetCallback("OnClick", function()
+        UpdateAuthUsers(authUsersEb:GetText());
+    end);
+    container:AddChild(authUsersBtn);
+end
+
+local function SelectTab(container, _, group)
+    container:ReleaseChildren();
+
+    if group == "mainMenu" then
+        return CreateMainMenuTab(container);
+    end
+    if group == "dataSync" then
+        return CreateDataSyncTab(container);
+    end
+    if group == "authUsers" then
+        return CreateAuthUsersTab(container);
+    end
+end
+
+local function CreateTabs()
+    if Regrowth.User:CanSendUpdates() then
+        return {
+            { text="Main Menu", value="mainMenu" },
+            { text="Data Sync", value="dataSync" },
+            { text="Authorised Users", value="authUsers" },
+        };
+    end
+
+    return {
+        { text="Main Menu", value="mainMenu" },
+        { text="Authorised Users", value="authUsers" },
+    }
+end
+
+local function CreateMainUI()
+    local uiFrame = Regrowth.AceGUI:Create("Frame");
+    uiFrame:SetTitle("Regrowth Loot Tool");
+    uiFrame:SetCallback("OnClose", function(widget)
+        Regrowth.AceGUI:Release(widget);
+        Regrowth.Frames.UIFrame = "closed";
+    end);
+    uiFrame:SetLayout("Fill");
+
+    local tabGroup = Regrowth.AceGUI:Create("TabGroup");
+    tabGroup:SetLayout("List");
+    tabGroup:SetTabs(CreateTabs());
+    tabGroup:SetCallback("OnGroupSelected", SelectTab);
+    tabGroup:SelectTab("mainMenu");
+
+    uiFrame:AddChild(tabGroup);
+
+    return uiFrame;
+end
+
+local function CreateCommunitiesButtonFrame()
+    local communitiesButtonFrame = CreateFrame( "Button" , "Regrowth_CommunitiesButton" , CommunitiesFrame.GuildInfoTab , "UIPanelButtonTemplate" );
+    -- communitiesButtonFrame:Hide();
+
+    communitiesButtonFrame.Text = communitiesButtonFrame:CreateFontString(nil, "OVERLAY", "GameFontWhiteTiny");
+    communitiesButtonFrame.Text:SetPoint("CENTER", communitiesButtonFrame);
+    communitiesButtonFrame.Text:SetText("");
+
+    communitiesButtonFrame:SetSize(40, 40);
+    communitiesButtonFrame:SetPoint("TOP", 2, -200);
+    communitiesButtonFrame:SetNormalTexture("Interface\\AddOns\\RegrowthLootTool\\Icons\\rlt");
+
+    communitiesButtonFrame:SetScript("OnClick", function (_, button)
+        if button == "LeftButton" then
+            if Regrowth.Frames.UIFrame == "closed" then
+                Regrowth.Frames.UIFrame = CreateMainUI();
+                Regrowth.Frames.UIFrame = "open";
+            end
+        end
+    end);
+
+    return communitiesButtonFrame;
+end
 
 function Frames:_init()
     if (self._initialized) then
         return;
     end
 
-    self.ImportFrame = Frames:CreateImportFrame();
-    self.CommunitiesUiButtonFrame = Frames:CreateCommunitiesButtonFrame();
+    -- self.UIFrame = CreateMainUI();
+    self.CommunitiesUiButtonFrame = CreateCommunitiesButtonFrame();
 
     self._initialized = true;
 end
 
-function Frames:CreateImportFrame()
+function CreateImportFrame()
     --- Main UI
     local importFrame = CreateFrame("Frame", "Regrowth_ImportFrame", UIParent, "BackdropTemplate");
     importFrame:Hide();
@@ -37,7 +158,9 @@ function Frames:CreateImportFrame()
     importFrame:SetBackdrop({
         bgFile = "Interface\\ChatFrame\\ChatFrameBackground",
         edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
-        tile = true, tileSize = 32, edgeSize = 32,
+        tile = true,
+        tileSize = 32,
+        edgeSize = 32,
         insets = { left = 8, right = 8, top = 8, bottom = 8 }
     });
     importFrame:SetBackdropColor(0, 0, 0, 0.95);
@@ -76,7 +199,7 @@ function Frames:CreateImportFrame()
             local ok, execErr = pcall(dataCb);
             if ok then
                 local count = 0
-                for _ in pairs(Regrowth_Data) do count = count + 1 end
+                for _ in pairs(Regrowth_Item_Data) do count = count + 1 end
                 Regrowth:success("Sync complete - " .. count .. " items loaded.");
                 importFrame:Hide();
             else
@@ -113,23 +236,4 @@ function Frames:CreateImportFrame()
     return importFrame;
 end
 
-function Frames:CreateCommunitiesButtonFrame()
-    local communitiesButtonFrame = CreateFrame( "Button" , "Regrowth_CommunitiesButton" , CommunitiesFrame.GuildInfoTab , "UIPanelButtonTemplate" );
-    -- communitiesButtonFrame:Hide();
-    
-    communitiesButtonFrame.Text = communitiesButtonFrame:CreateFontString(nil, "OVERLAY", "GameFontWhiteTiny");
-    communitiesButtonFrame.Text:SetPoint("CENTER", communitiesButtonFrame);
-    communitiesButtonFrame.Text:SetText("");
 
-    communitiesButtonFrame:SetSize(40, 40);
-    communitiesButtonFrame:SetPoint("TOP", 2, -200);
-    communitiesButtonFrame:SetNormalTexture("Interface\\AddOns\\RegrowthLootTool\\Icons\\rlt");
-
-    communitiesButtonFrame:SetScript("OnClick", function (_, button)
-        if button == "LeftButton" then
-            Regrowth.Commands:call("openimport");
-        end
-    end);
-
-    return communitiesButtonFrame;
-end

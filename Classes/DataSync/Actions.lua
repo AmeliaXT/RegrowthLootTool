@@ -12,7 +12,7 @@ local CommActions = {
     [Actions.updateData] = function(Message)
         Regrowth:success("Updating your loot data");
 
-        Regrowth_Data = Message.content
+        Regrowth_Item_Data = Message.content
     end,
     [Actions.updatePlayers] = function(Message)
         Regrowth:success("Updating your player data");
