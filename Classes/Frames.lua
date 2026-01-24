@@ -13,7 +13,11 @@ local Frames = {
 Regrowth.Frames = Frames;
 
 local function UpdateAuthUsers(authUsers)
-    Regrowth.Data:UpdateDataAndSave(authUsers, "AuthorisedUsers");
+    Regrowth.Data:UpdateLocalDataAndSave(authUsers, "AuthorisedUsers");
+end
+
+local function UpdateAllData(importData)
+    Regrowth.Data:UpdateLocalDataAndSaveFromImport(importData);
 end
 
 local function CreateMainMenuTab(container)
@@ -40,6 +44,21 @@ local function CreateDataSyncTab(container)
     container:AddChild(button);
 end
 
+local function CreateImportDataTab(container)
+    local importDataEb = Regrowth.AceGUI:Create("MultiLineEditBox");
+    importDataEb:SetFullWidth(true);
+    importDataEb:SetNumLines(20);
+    importDataEb:SetLabel("Import Data");
+
+    local importDataBtn = importDataEb.button;
+    importDataBtn:SetText("Save");
+    importDataBtn:SetScript("OnClick", function()
+        UpdateAllData(importDataEb:GetText());
+    end);
+
+    container:AddChild(importDataEb);
+end
+
 local function CreateAuthUsersTab(container)
     local authUsersLbl = Regrowth.AceGUI:Create("Label");
     authUsersLbl:SetText("Authorised Users - CSL");
@@ -48,6 +67,7 @@ local function CreateAuthUsersTab(container)
 
     local authUsersEb = Regrowth.AceGUI:Create("EditBox");
     authUsersEb:SetFullWidth(true);
+    authUsersEb:SetMaxLetters(0);
     authUsersEb:SetText(Regrowth.Data.Storage.AuthorisedUsers.data);
     container:AddChild(authUsersEb);
 
@@ -68,23 +88,33 @@ local function SelectTab(container, _, group)
     if group == "dataSync" then
         return CreateDataSyncTab(container);
     end
+    if group == "importData" then
+        return CreateImportDataTab(container);
+    end
     if group == "authUsers" then
         return CreateAuthUsersTab(container);
     end
 end
 
 local function CreateTabs()
-    if Regrowth.User:CanSendUpdates() then
+    if Regrowth.User.canSendUpdates then
         return {
             { text="Main Menu", value="mainMenu" },
             { text="Data Sync", value="dataSync" },
+            { text="Import data", value="importData" },
             { text="Authorised Users", value="authUsers" },
+        };
+    end
+
+    if Regrowth.User.canReceiveUpdates then
+        return {
+            { text="Main Menu", value="mainMenu" },
+            { text="Data Sync", value="dataSync" },
         };
     end
 
     return {
         { text="Main Menu", value="mainMenu" },
-        { text="Authorised Users", value="authUsers" },
     }
 end
 

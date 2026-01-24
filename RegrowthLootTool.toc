@@ -17,6 +17,7 @@ Data.lua
 
 # Helpers
 Utils/helpers.lua
+Utils/json.lua
 
 # Class objects
 Classes/Commands.lua

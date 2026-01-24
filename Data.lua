@@ -143,49 +143,56 @@ local function UpdateRecipes(recipes)
     RegrowthData.Storage.Recipes = recipes;
 end
 
-function RegrowthData:UpdateData(newData, table)
-    if type(table) ~= "string" then
-        Regrowth:error("Unable to update data. Invalid data type for table" .. type(table) .. "'.");
+local function UpdateAuthorisedData(newData, table)
+    local mappedData = {
+        data = newData,
+        timestamp = GetServerTime(),
+    }
+
+    if table == "AuthorisedUsers" then
+        return UpdateAuthorisedUsers(mappedData);
     end
 
-    Regrowth:debug(table);
+    if table == "Items" then
+        return UpdateItems(mappedData);
+    end
 
-    if table ~= "AuthorisedUsers" and
+    if table == "Players" then
+        return UpdatePlayers(mappedData);
+    end
+end
+
+function RegrowthData:UpdateLocalData(newData, table)
+    if type(table) ~= "string" then
+        Regrowth:error("Unable to update data. Invalid data type for table" .. type(table) .. "'.");
+        return;
+    end
+
+    if (table ~= "AuthorisedUsers" and
         table ~= "Items" and
         table ~= "Players" and
-        table ~= "Recipes"
+        table ~= "Recipes")
     then
         Regrowth:error("Unable to update data. Invalid table '" .. table .. "'.");
         return;
     end
 
-    local mappedData = {
-        timestamp = GetServerTime(),
-    }
-
-    if table == "AuthorisedUsers" then
-        Regrowth:debug(tostring(newData));
-        mappedData.data = newData;
-        return UpdateAuthorisedUsers(mappedData);
+    if (table == "AuthorisedUsers" or
+        table == "Players" or
+        table == "Items")
+    then
+        if Regrowth.User.canReceiveUpdates then
+            return UpdateAuthorisedData(newData, table);
+        else
+            Regrowth:error("Unable to update data. User not authorised.");
+            return;
+        end
     end
 
-    if table == "Items" then
-        mappedData.data = newData;
-        return UpdateItems(mappedData);
-    end
-
-    if table == "Players" then
-        mappedData.data = newData;
-        return UpdatePlayers(mappedData);
-    end
-
-    if table == "Recipes" then
-        mappedData.data = newData;
-        return UpdateRecipes(mappedData);
-    end
+    return UpdateRecipes(newData);
 end
 
-function RegrowthData:UpdateSavedData()
+function RegrowthData:UpdateLocalSavedData()
     if not Regrowth:isCurrentVersion() then
         Regrowth:warning("Can't update local Regrowth_Data - Version out of date.");
         return;
@@ -194,14 +201,25 @@ function RegrowthData:UpdateSavedData()
     Regrowth_Data = self.Storage;
 end
 
-function RegrowthData:UpdateDataAndSave(newData, table)
+function RegrowthData:UpdateLocalDataAndSave(newData, table)
     if not Regrowth:isCurrentVersion() then
         Regrowth:warning("Can't update local Regrowth_Data - Version out of date.");
         return;
     end
 
-    self:UpdateData(newData, table);
-    self:UpdateSavedData();
+    self:UpdateLocalData(newData, table);
+    self:UpdateLocalSavedData();
+end
+
+function RegrowthData:UpdateLocalDataAndSaveFromImport(import)
+    if not Regrowth:isCurrentVersion() then
+        Regrowth:warning("Can't update local Regrowth_Data - Version out of date.");
+        return;
+    end
+
+    local table = Regrowth.json.decode(import);
+
+    ---table["items"][1]["123"]
 end
 
 function RegrowthData:_init()

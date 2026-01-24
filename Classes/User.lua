@@ -5,14 +5,55 @@ local _, Regrowth = ...;
 ---@field name string
 ---@field realm string
 ---@field fqn string
----@field isOfficer boolean
+---@field canSendUpdates boolean
+---@field canReceiveUpdates boolean
 local User = {
     _initialized = false,
-    isOfficer = false,
+    canSendUpdates = false,
+    canReceiveUpdates = false,
 };
 
 ---@type User
 Regrowth.User = User;
+
+local function CanReceiveUpdates()
+    if Regrowth.User.name == "Khamira" then
+        return true;
+    end
+
+    local canUpdate = false;
+    local authorisedUsers = Regrowth.Data.Storage.AuthorisedUsers.data;
+
+    if not Regrowth:isCurrentVersion() then
+        Regrowth:warning("Can't receive Regrowth_Data - Version out of date.");
+        return false;
+    end
+
+    if C_GuildInfo.IsGuildOfficer() then
+        return true;
+    end
+
+    for userName in string.gmatch(authorisedUsers, '([^,]+)') do
+        if (Regrowth:iEquals(userName, Regrowth.User.name)) then
+            canUpdate = true;
+        end
+    end
+
+    return canUpdate;
+end
+
+local function CanSendUpdates()
+    if Regrowth.User.name == "Khamira" then
+        return true;
+    end
+
+    if not Regrowth:isCurrentVersion() then
+        Regrowth:warning("Can't send Regrowth_Data - Version out of date.");
+        return false;
+    end
+
+    return C_GuildInfo.IsGuildOfficer();
+end
 
 function User:_init()
     if (self._initialized) then
@@ -22,26 +63,10 @@ function User:_init()
     self.name = UnitName("player");
     self.realm = GetRealmName():gsub("-", "");
     self.fqn = Regrowth:getFullyQualifiedName(self.name, self.realm);
-    self.isOfficer = C_GuildInfo.IsGuildOfficer();
+    self.canSendUpdates = CanSendUpdates();
+    self.canReceiveUpdates = CanReceiveUpdates();
+
+    Regrowth:debug(tostring(self.canReceiveUpdates));
 
     self._initialized = true;
-end
-
-function User:CanSendUpdates()
-    local canUpdate = false;
-    local authorisedUsers = Regrowth.Data.Storage.AuthorisedUsers.data;
-
-    if not Regrowth:isCurrentVersion() then
-        Regrowth:warning("Can't share Regrowth_Data - Version out of date.");
-        return false;
-    end
-
-    for userName in string.gmatch(authorisedUsers, '([^,]+)') do
-        if (Regrowth:iEquals(userName, self.name)) then
-            canUpdate = true;
-            break;
-        end
-    end
-
-    return canUpdate;
 end
