@@ -1,72 +1,53 @@
 local _, Regrowth = ...;
 
----@type RegrowthConsts
-local Consts = Regrowth.Data.Constants;
+---@type RegrowthData
+local RegrowthData = Regrowth.Data;
 
 ---@class Commands
 local Commands = {
-    CommandDescriptions = {
-        test = "yup",
-    },
+    nex = function() 
+        Regrowth.Comm.Message.new(
+            RegrowthData.Constants.Comm.Actions.nex,
+            "Nex says hi (>^.^<)",
+            "GUILD"
+        ):send();
+    end,
+    openmainui = function()
+        Regrowth.Frames:CreateMainUI();
+    end,
+    senddatasync = function()
+        if Regrowth.User.canSendUpdates then
+            local receivers = RegrowthData.Storage.LootCouncil.data;
 
-    Dictionary = {
-        nex = function() 
-            Regrowth.Comm.Message.new(
-                Consts.Comm.Actions.nex,
-                "Nex says hi (>^.^<)",
-                "GUILD"
-            ):send();
-        end,
-        senddataupdate = function()
-            Regrowth.Comm.Message.new(
-                Consts.Comm.Actions.updateData,
-                Regrowth_Data,
-                "GUILD"
-            ):send();
-        end,
-        sendplayerupdate = function()
-            Regrowth.Comm.Message.new(
-                Consts.Comm.Actions.updatePlayers,
-                Regrowth_Players,
-                "GUILD"
-            ):send();
-        end,
-        sendrecipeupdate = function()
-            Regrowth.Comm.Message.new(
-                Consts.Comm.Actions.updateRecipes,
-                Regrowth_Recipes,
-                "GUILD"
-            ):send();
-        end,
-        openimport = function()
-            if Regrowth.Frames.ImportFrame:IsShown() then
-                Regrowth.Frames.ImportFrame:Hide();
-            else
-                Regrowth.Frames.ImportFrame:Show();
-                Regrowth.Frames.ImportFrame.EditBox:SetFocus();
+            local message = Regrowth.Comm.Message.new(
+                RegrowthData.Constants.Comm.Actions.handlereceiveddata,
+                "NewData",
+                "OFFICER"
+            );
+
+            message:send();
+
+            for receiver in string.gmatch(receivers, '([^,]+)') do
+                Regrowth:debug("Sending data to '" .. receiver .. "'.");
+
+                local message = Regrowth.Comm.Message.new(
+                    RegrowthData.Constants.Comm.Actions.handlereceiveddata,
+                    "NewData",
+                    "WHISPER",
+                    receiver
+                );
+
+                message:send();
             end
-        end,
-    }
+
+            return;
+        end
+
+        Regrowth:error("You are not authorised to send data.");
+    end,
 };
 
----@type Commands
-Regrowth.Commands = Commands;
-
-function Commands:_init()
-    Regrowth.Ace:RegisterChatCommand("rg", function (...)
-        Regrowth.Commands:_dispatch(...);
-    end);
-
-    Regrowth.Ace:RegisterChatCommand("regrowth", function ()
-        Regrowth.Commands:_dispatch("openimport")
-    end)
-end
-
-function Commands:call(str)
-    return Commands:_dispatch(str);
-end
-
-function Commands:_dispatch(str)
+local function _dispatch(str)
     local command = str:match("^(%S+)");
     local argumentStr = "";
 
@@ -75,8 +56,7 @@ function Commands:_dispatch(str)
     end
 
     if (not str or #str < 1) then
-        command = Regrowth:warning("Run a command you dummy :). Try /rg nex")
-        return;
+        command = "openmainui";
     end
 
     command = string.lower(command);
@@ -85,9 +65,24 @@ function Commands:_dispatch(str)
 
     args = { strsplit(" ", argumentStr, 1) };
 
-    if (command and self.Dictionary[command]and type(self.Dictionary[command]) == "function") then
-        return self.Dictionary[command](unpack(args))
+    if (command and Regrowth.Commands[command]and type(Regrowth.Commands[command]) == "function") then
+        return Regrowth.Commands[command](unpack(args))
     end
-
-    return self.Dictionary["nex"]();
 end;
+
+---@type Commands
+Regrowth.Commands = Commands;
+
+function Commands:_init()
+    Regrowth.Ace:RegisterChatCommand("rg", function (...)
+        return _dispatch(...);
+    end);
+
+    Regrowth.Ace:RegisterChatCommand("regrowth", function (...)
+        return _dispatch(...)
+    end)
+end
+
+function Commands:call(str)
+    return _dispatch(str);
+end

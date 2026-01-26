@@ -33,6 +33,7 @@ function Message.new(action, content, channel, recipient, onResponse)
     self.sender = Regrowth.User.name;
     self.senderFqn = Regrowth.User.fqn;
     self.recipient = recipient or nil;
+
     self.onResponse = onResponse or function () end;
 
     return self;
@@ -44,6 +45,7 @@ function Message.newFromReceived(payload)
     self.action = payload.action;
     self.content = payload.content;
     self.channel = payload.channel;
+    self.sender = payload.sender;
     self.senderFqn = payload.senderFqn;
     self.recipient = payload.recipient;
 

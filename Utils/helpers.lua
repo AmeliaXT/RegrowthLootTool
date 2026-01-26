@@ -142,6 +142,22 @@ function Regrowth:strStartsWith(str, startStr, insensitive)
     return string.sub(str, 1, string.len(startStr)) == startStr;
 end
 
+function Regrowth:verifyMessageSender(sender)
+    local isValid = false;
+
+    for validSender in string.gmatch(Regrowth.Data.Storage.LootCouncil.data, '([^,]+)') do
+        if Regrowth:iEquals(sender, validSender) then
+            isValid = true;
+        end
+    end
+
+    return isValid;
+end
+
+function Regrowth:isCurrentVersion()
+    return Regrowth.Data.Version.current and Regrowth.Data.Version.current == Regrowth.Data.Version.latest;
+end
+
 function Regrowth:message(...)
     print(msgPrefix .. " " .. table.concat({ ... }, " "));
 end

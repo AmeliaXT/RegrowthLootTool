@@ -12,15 +12,15 @@ local Comm = {
 ---@type Comm
 Regrowth.Comm = Comm;
 
----@type RegrowthConsts
-local Constants = Regrowth.Data.Constants;
+---@type RegrowthData
+local RegrowthData = Regrowth.Data;
 
 function Comm:_init()
     if (self._initialized) then
         return;
     end
 
-    self.channel = Constants.Comm.channel;
+    self.channel = RegrowthData.Constants.Comm.channel;
 
     Regrowth.Ace:RegisterComm(self.channel, Comm.listen);
 

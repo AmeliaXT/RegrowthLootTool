@@ -9,9 +9,10 @@ local appName;
 appName, Regrowth = ...;
 
 -- Initialize Persistent Storage
-Regrowth_Data = Regrowth_Data or {}
-Regrowth_Recipes = Regrowth_Recipes or {}
-Regrowth_Players = Regrowth_Players or {}
+Regrowth_Data = Regrowth_Data or {};
+Regrowth_Item_Data = Regrowth_Item_Data or {};
+Regrowth_Recipes = Regrowth_Recipes or {};
+Regrowth_Players = Regrowth_Players or {};
 
 Regrowth.name = appName;
 Regrowth._initialized = false;
@@ -19,8 +20,11 @@ Regrowth.EventFrame = nil;
 
 Regrowth.Ace = LibStub("AceAddon-3.0"):NewAddon(Regrowth.name, "AceConsole-3.0", "AceComm-3.0", "AceTimer-3.0");
 
+---@type AceGUI-3.0
+Regrowth.AceGUI = LibStub("AceGUI-3.0");
+
 function Regrowth:_init()
-    -- self.DB:_init();
+    self.Data:_init();
     self.Commands:_init();
     self.Frames:_init();
     self.User:_init();
@@ -62,10 +66,10 @@ local function ProcessItemTooltip(tooltip)
     end
 
     -- 1. Check Loot Priority
-    if Regrowth_Data[itemID] then
+    if Regrowth_Item_Data[itemID] then
         tooltip:AddLine(" ");
         tooltip:AddLine("Regrowth Bias:", 0.1, 1, 0.6);
-        tooltip:AddLine(Regrowth_Data[itemID], 1, 1, 1, true);
+        tooltip:AddLine(Regrowth_Item_Data[itemID], 1, 1, 1, true);
     end
 
     -- 2. Check Recipes
