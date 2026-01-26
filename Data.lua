@@ -16,9 +16,7 @@ local RegrowthData = {
 
             Actions = {
                 nex = 1,
-                updateData = 2,
-                updatePlayers = 3,
-                updateRecipes = 4,
+                handlereceiveddata = 2,
             },
         },
     },
@@ -219,7 +217,17 @@ function RegrowthData:UpdateLocalDataAndSaveFromImport(import)
 
     local table = Regrowth.json.decode(import);
 
-    ---table["items"][1]["123"]
+    if table["items"] then
+        self:UpdateLocalDataAndSave(table["items"], "Items");
+    end
+
+    if table["players"] then
+        self:UpdateLocalDataAndSave(table["players"], "Players");
+    end
+
+    if table["recipes"] then
+        self:UpdateLocalDataAndSave(table["recipes"], "Recipes");
+    end
 end
 
 function RegrowthData:_init()
