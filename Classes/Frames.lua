@@ -16,8 +16,8 @@ local function SendDataSync()
     Regrowth.Commands:call("senddatasync");
 end
 
-local function UpdateLocalAuthUsers(authUsers)
-    Regrowth.Data:UpdateLocalDataAndSave(authUsers, "AuthorisedUsers");
+local function UpdateLocalLootCouncil(lootCouncil)
+    Regrowth.Data:UpdateLocalDataAndSave(lootCouncil, "LootCouncil");
 end
 
 local function UpdateLocalData(importData)
@@ -25,20 +25,30 @@ local function UpdateLocalData(importData)
 end
 
 local function CreateMainMenuTab(container)
-    local desc = Regrowth.AceGUI:Create("Label");
-    desc:SetText("Main Menu");
-    desc:SetFullWidth(true);
-    container:AddChild(desc);
+    local mainMenuHeading = Regrowth.AceGUI:Create("Heading");
+    mainMenuHeading:SetText("Regrowth Loot Tool");
+    mainMenuHeading:SetFullWidth(true);
+    container:AddChild(mainMenuHeading);
 
-    local msg = Regrowth.AceGUI:Create("Label");
-    msg:SetText("Addon is currently still in development. Features may not work as expected.");
-    msg:SetFullWidth(true);
-    container:AddChild(msg);
+    local mainMenuIntro = Regrowth.AceGUI:Create("Label");
+    mainMenuIntro:SetText("Addon is currently still in development. Features may not work as expected.");
+    mainMenuIntro:SetFullWidth(true);
+    container:AddChild(mainMenuIntro);
+
+    local mainMenuCredit = Regrowth.AceGUI:Create("Label");
+    mainMenuCredit:SetText("Addon implementation by Amy. Addon protoype and design by Juice. <3");
+    mainMenuCredit:SetFullWidth(true);
+    container:AddChild(mainMenuCredit);
 end
 
 local function CreateDataSyncTab(container)
+    local dataSyncHeading = Regrowth.AceGUI:Create("Heading");
+    dataSyncHeading:SetText("Data Sync");
+    dataSyncHeading:SetFullWidth(true);
+    container:AddChild(dataSyncHeading);
+
     local desc = Regrowth.AceGUI:Create("Label");
-    desc:SetText("Data Sync");
+    desc:SetText("Synchronise data between all loot council members.");
     desc:SetFullWidth(true);
     container:AddChild(desc);
 
@@ -52,10 +62,15 @@ local function CreateDataSyncTab(container)
 end
 
 local function CreateImportDataTab(container)
+    local importDataHeading = Regrowth.AceGUI:Create("Heading");
+    importDataHeading:SetText("Import Data");
+    importDataHeading:SetFullWidth(true);
+    container:AddChild(importDataHeading);
+
     local importDataEb = Regrowth.AceGUI:Create("MultiLineEditBox");
     importDataEb:SetFullWidth(true);
     importDataEb:SetNumLines(20);
-    importDataEb:SetLabel("Import Data");
+    importDataEb:SetLabel("");
 
     local importDataBtn = importDataEb.button;
     importDataBtn:SetText("Save");
@@ -66,24 +81,39 @@ local function CreateImportDataTab(container)
     container:AddChild(importDataEb);
 end
 
-local function CreateAuthUsersTab(container)
-    local authUsersLbl = Regrowth.AceGUI:Create("Label");
-    authUsersLbl:SetText("Authorised Users - CSL");
-    authUsersLbl:SetFullWidth(true);
-    container:AddChild(authUsersLbl);
+local function CreateLootCouncilTab(container)
+    local lootCouncilHeading = Regrowth.AceGUI:Create("Heading");
+    lootCouncilHeading:SetText("Loot Council");
+    lootCouncilHeading:SetFullWidth(true);
+    container:AddChild(lootCouncilHeading);
 
-    local authUsersEb = Regrowth.AceGUI:Create("EditBox");
-    authUsersEb:SetFullWidth(true);
-    authUsersEb:SetMaxLetters(0);
-    authUsersEb:SetText(Regrowth.Data.Storage.AuthorisedUsers.data);
-    container:AddChild(authUsersEb);
+    local lootCouncilLbl = Regrowth.AceGUI:Create("Label");
+    lootCouncilLbl:SetText("By default, all officers in the guild will be considered part of the loot council.\n\nOthers can be added to receive data, but will NOT be able to send data. \n\n");
+    lootCouncilLbl:SetFullWidth(true);
+    container:AddChild(lootCouncilLbl);
 
-    local authUsersBtn = Regrowth.AceGUI:Create("Button");
-    authUsersBtn:SetText("Save");
-    authUsersBtn:SetCallback("OnClick", function()
-        UpdateLocalAuthUsers(authUsersEb:GetText());
+    local lootCouncilAdditionalHeading = Regrowth.AceGUI:Create("Heading");
+    lootCouncilAdditionalHeading:SetText("Additional Members");
+    lootCouncilAdditionalHeading:SetFullWidth(true);
+    container:AddChild(lootCouncilAdditionalHeading);
+
+    local lootCouncilAdditionalLbl = Regrowth.AceGUI:Create("Label");
+    lootCouncilAdditionalLbl:SetText("Additional character names. Comma separated e.g. \"Nex, Juice\"");
+    lootCouncilAdditionalLbl:SetFullWidth(true);
+    container:AddChild(lootCouncilAdditionalLbl);
+
+    local lootCouncilAdditionalList = Regrowth.AceGUI:Create("EditBox");
+    lootCouncilAdditionalList:SetFullWidth(true);
+    lootCouncilAdditionalList:SetMaxLetters(0);
+    lootCouncilAdditionalList:SetText(Regrowth.Data.Storage.LootCouncil.data);
+    container:AddChild(lootCouncilAdditionalList);
+
+    local lootCouncilSaveBtn = Regrowth.AceGUI:Create("Button");
+    lootCouncilSaveBtn:SetText("Save");
+    lootCouncilSaveBtn:SetCallback("OnClick", function()
+        UpdateLocalLootCouncil(lootCouncilAdditionalList:GetText());
     end);
-    container:AddChild(authUsersBtn);
+    container:AddChild(lootCouncilSaveBtn);
 end
 
 local function SelectTab(container, _, group)
@@ -98,8 +128,8 @@ local function SelectTab(container, _, group)
     if group == "importData" then
         return CreateImportDataTab(container);
     end
-    if group == "authUsers" then
-        return CreateAuthUsersTab(container);
+    if group == "lootCouncil" then
+        return CreateLootCouncilTab(container);
     end
 end
 
@@ -109,7 +139,7 @@ local function CreateTabs()
             { text="Main Menu", value="mainMenu" },
             { text="Data Sync", value="dataSync" },
             { text="Import data", value="importData" },
-            { text="Authorised Users", value="authUsers" },
+            { text="Loot Council", value="lootCouncil" },
         };
     end
 

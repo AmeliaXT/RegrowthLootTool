@@ -22,7 +22,7 @@ local function CanReceiveUpdates()
     end
 
     local canUpdate = false;
-    local authorisedUsers = Regrowth.Data.Storage.AuthorisedUsers.data;
+    local lootCouncil = Regrowth.Data.Storage.LootCouncil.data;
 
     if not Regrowth:isCurrentVersion() then
         Regrowth:warning("Can't receive Regrowth_Data - Version out of date.");
@@ -33,7 +33,7 @@ local function CanReceiveUpdates()
         return true;
     end
 
-    for userName in string.gmatch(authorisedUsers, '([^,]+)') do
+    for userName in string.gmatch(lootCouncil, '([^,]+)') do
         if (Regrowth:iEquals(userName, Regrowth.User.name)) then
             canUpdate = true;
         end

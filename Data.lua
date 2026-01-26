@@ -4,7 +4,7 @@ local _, Regrowth = ...;
 ---@class RegrowthData
 ---@field Constants table
 ---@field Version string
----@field AuthorisedUsers string
+---@field LootCouncil string
 ---@field Items table
 ---@field Players table
 ---@field Recipes table
@@ -25,7 +25,7 @@ local RegrowthData = {
         latest = "0.3",
     },
     Storage = {
-        AuthorisedUsers = {
+        LootCouncil = {
             data = "Amy,Billy",
             timestamp = 0,
         },
@@ -89,17 +89,17 @@ local function isValidData(input, dataType)
     return true;
 end
 
-local function UpdateAuthorisedUsers(users)
+local function UpdateLootCouncil(users)
     if not isValidData(users, "string") then
         return;
     end
 
-    if isOlderData(users.timestamp, RegrowthData.Storage.AuthorisedUsers.timestamp) then
-        Regrowth:warning("Update for AuthorisedUsers skipped - Current data is newer.");
+    if isOlderData(users.timestamp, RegrowthData.Storage.LootCouncil.timestamp) then
+        Regrowth:warning("Update for LootCouncil skipped - Current data is newer.");
         return;
     end
 
-    RegrowthData.Storage.AuthorisedUsers = users;
+    RegrowthData.Storage.LootCouncil = users;
 end
 
 local function UpdateItems(items)
@@ -141,14 +141,14 @@ local function UpdateRecipes(recipes)
     RegrowthData.Storage.Recipes = recipes;
 end
 
-local function UpdateAuthorisedData(newData, table)
+local function UpdateProtectedData(newData, table)
     local mappedData = {
         data = newData,
         timestamp = GetServerTime(),
     }
 
-    if table == "AuthorisedUsers" then
-        return UpdateAuthorisedUsers(mappedData);
+    if table == "LootCouncil" then
+        return UpdateLootCouncil(mappedData);
     end
 
     if table == "Items" then
@@ -166,7 +166,7 @@ function RegrowthData:UpdateLocalData(newData, table)
         return;
     end
 
-    if (table ~= "AuthorisedUsers" and
+    if (table ~= "LootCouncil" and
         table ~= "Items" and
         table ~= "Players" and
         table ~= "Recipes")
@@ -175,12 +175,12 @@ function RegrowthData:UpdateLocalData(newData, table)
         return;
     end
 
-    if (table == "AuthorisedUsers" or
+    if (table == "LootCouncil" or
         table == "Players" or
         table == "Items")
     then
         if Regrowth.User.canReceiveUpdates then
-            return UpdateAuthorisedData(newData, table);
+            return UpdateProtectedData(newData, table);
         else
             Regrowth:error("Unable to update data. User not authorised.");
             return;
@@ -240,7 +240,7 @@ function RegrowthData:_init()
     if not Regrowth:empty(Regrowth_Data) then
         self.Storage = Regrowth_Data
     else
-        Regrowth_Data = tostring(self.Storage);
+        Regrowth_Data = self.Storage;
     end
 
     self._initialized = true;

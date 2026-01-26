@@ -10,7 +10,7 @@ local CommActions = {
         Regrowth:success("Message received: " .. Message.content);
     end,
     [Actions.handlereceiveddata] = function(Message)
-        if Regrowth.User.canReceiveData then
+        if Regrowth.User.canReceiveUpdates then
             if not Message.sender then
                 Regrowth:error("Received message from unknown sender. Ignoring.");
                 return;

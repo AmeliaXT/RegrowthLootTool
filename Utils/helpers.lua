@@ -145,7 +145,7 @@ end
 function Regrowth:verifyMessageSender(sender)
     local isValid = false;
 
-    for validSender in string.gmatch(Regrowth.Data.Storage.AuthorisedUsers.data, '([^,]+)') do
+    for validSender in string.gmatch(Regrowth.Data.Storage.LootCouncil.data, '([^,]+)') do
         if Regrowth:iEquals(sender, validSender) then
             isValid = true;
         end
