@@ -18,21 +18,22 @@ local Commands = {
     senddatasync = function()
         if Regrowth.User.canSendUpdates then
             local receivers = RegrowthData.Storage.LootCouncil.data;
+            Regrowth:debug("Sending data to 'OFFFICER' chat.");
 
-            local message = Regrowth.Comm.Message.new(
+            local officerMessage = Regrowth.Comm.Message.new(
                 RegrowthData.Constants.Comm.Actions.handlereceiveddata,
-                "NewData",
+                Regrowth_Data,
                 "OFFICER"
             );
 
-            message:send();
+            officerMessage:send();
 
             for receiver in string.gmatch(receivers, '([^,]+)') do
                 Regrowth:debug("Sending data to '" .. receiver .. "'.");
 
                 local message = Regrowth.Comm.Message.new(
                     RegrowthData.Constants.Comm.Actions.handlereceiveddata,
-                    "NewData",
+                    Regrowth_Data,
                     "WHISPER",
                     receiver
                 );

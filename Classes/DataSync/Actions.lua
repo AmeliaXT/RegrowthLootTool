@@ -17,7 +17,8 @@ local CommActions = {
             end
 
             if Regrowth:verifyMessageSender(Message.sender) then
-                Regrowth:success("Received data from valid user. Feature NYI.");
+                Regrowth:debug("Updating local data");
+                Regrowth.Data:UpdateLocalDataFromSync(Message.content);
                 return;
             end
 
@@ -25,7 +26,7 @@ local CommActions = {
             return;
         end
 
-        Regrowth:error("You are not authorised to receive data.");
+        Regrowth.Data:UpdateLocalRecipeDataFromSync(Message.content);
     end,
 };
 

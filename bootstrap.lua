@@ -65,18 +65,21 @@ local function ProcessItemTooltip(tooltip)
         return;
     end
 
+    local itemData = Regrowth_Data.Items.data;
+    local recipeData = Regrowth_Data.Recipes.data;
+
     -- 1. Check Loot Priority
-    if Regrowth_Item_Data[itemID] then
+    if itemData[itemID] then
         tooltip:AddLine(" ");
         tooltip:AddLine("Regrowth Bias:", 0.1, 1, 0.6);
-        tooltip:AddLine(Regrowth_Item_Data[itemID], 1, 1, 1, true);
+        tooltip:AddLine(itemData[itemID], 1, 1, 1, true);
     end
 
     -- 2. Check Recipes
-    if Regrowth_Recipes[itemID] then
+    if recipeData[itemID] then
         tooltip:AddLine(" ");
         tooltip:AddLine("Known By:", 0.1, 1, 0.6);
-        tooltip:AddLine(Regrowth_Recipes[itemID], 1, 1, 1, true);
+        tooltip:AddLine(recipeData[itemID], 1, 1, 1, true);
     end
 end
 
@@ -87,7 +90,9 @@ local function ProcessUnitTooltip(tooltip)
 
     local name = tooltip:GetUnit();
 
-    local playerData = Regrowth_Players[name]
+    local pData = Regrowth_Data.Players.data;
+
+    local playerData = pData[name]
     if playerData then
         tooltip:AddLine(" ");
         tooltip:AddLine("Guild Raid Stats:", 0.1, 1, 0.6);
