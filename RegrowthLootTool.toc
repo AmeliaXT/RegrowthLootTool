@@ -2,8 +2,8 @@
 ## Title: Regrowth Loot Tool
 ## IconTexture: Interface\AddOns\RegrowthLootTool\Icons\nex
 ## Notes: Guild loot biases, attendance, and player loot history.
-## Author: Amy (Kyukon / Khamira) & Juice
-## Version: 0.3
+## Author: Amy (Kyukon / Khamira) & SoulJuice
+## Version: 0.4
 ## SavedVariables: Regrowth_Data, Regrowth_Item_Data, Regrowth_Recipes, Regrowth_Players
 
 # Libraries

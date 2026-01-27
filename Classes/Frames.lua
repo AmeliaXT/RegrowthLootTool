@@ -6,7 +6,7 @@ local _, Regrowth = ...;
 local Frames = {
     _initialized = false,
     UIFrame = "closed",
-    AuthUsers = "Amy,Juice"
+    AuthUsers = "Khamira,Kyukon"
 };
 
 ---@type Frames
@@ -36,7 +36,7 @@ local function CreateMainMenuTab(container)
     container:AddChild(mainMenuIntro);
 
     local mainMenuCredit = Regrowth.AceGUI:Create("Label");
-    mainMenuCredit:SetText("Addon implementation by Amy. Addon protoype and design by Juice. <3");
+    mainMenuCredit:SetText("Addon implementation by Amy. Addon protoype and design by SoulJuice. <3");
     mainMenuCredit:SetFullWidth(true);
     container:AddChild(mainMenuCredit);
 end
@@ -48,12 +48,12 @@ local function CreateDataSyncTab(container)
     container:AddChild(dataSyncHeading);
 
     local desc = Regrowth.AceGUI:Create("Label");
-    desc:SetText("Synchronise data between all loot council members.");
+    desc:SetText("Send local data to all valid receivers.");
     desc:SetFullWidth(true);
     container:AddChild(desc);
 
     local syncDataBtn = Regrowth.AceGUI:Create("Button");
-    syncDataBtn:SetText("Test sending data.");
+    syncDataBtn:SetText("Send.");
     syncDataBtn:SetWidth(200);
     syncDataBtn:SetCallback("OnClick", function()
         SendDataSync();
