@@ -22,7 +22,7 @@ local function CanReceiveUpdates()
     end
 
     local canUpdate = false;
-    local lootCouncil = Regrowth.Data.Storage.LootCouncil.data;
+    local lootCouncil = Regrowth.Data.Storage.LootCouncil.data or "";
 
     if not Regrowth:isCurrentVersion() then
         Regrowth:warning("Can't receive Regrowth_Data - Version out of date.");

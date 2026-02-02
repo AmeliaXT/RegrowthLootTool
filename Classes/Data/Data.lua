@@ -22,9 +22,13 @@ local RegrowthData = {
     },
     Version = {
         current = "0.0",
-        latest = "0.4",
+        latest = "0.5",
     },
     Storage = {
+        LastUpdate = {
+            user = "",
+            timestamp = 0,
+        },
         LootCouncil = {
             data = "Amy,Billy",
             timestamp = 0,
@@ -349,6 +353,11 @@ function RegrowthData:UpdateLocalDataFromSync(newData)
         Regrowth:warning("Can't update local Regrowth_Data - Version out of date.");
         return;
     end
+
+    -- if not RegrowthData.Validation:isValidSchema(newData) then
+    --     Regrowth:error("Input does not match expected schema.");
+    --     return;
+    -- end
 
     if newData["Items"] then
         Regrowth:debug("New 'items' data received. Updating...")

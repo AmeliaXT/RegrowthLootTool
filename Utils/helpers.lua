@@ -41,6 +41,19 @@ function Regrowth:empty(mixed)
     return true;
 end
 
+function Regrowth:isArray(tbl)
+    local i = 0;
+
+    for _ in pairs(tbl) do
+        i = i + 1;
+        if tbl[i] == nil then
+            return false;
+        end
+    end
+
+    return true;
+end
+
 function Regrowth:getFullyQualifiedName(name, realm)
     realm = not self:empty(realm) and realm or nil;
     name = tostring(name);
@@ -179,6 +192,10 @@ function Regrowth:error(...)
 end
 
 function Regrowth:debug(...)
+    if Regrowth.Settings.DebugMode ~= "on" then
+        return;
+    end
+
     Regrowth:coloredMessage("F7922E", ...);
 end
 

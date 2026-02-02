@@ -3,8 +3,8 @@
 ## IconTexture: Interface\AddOns\RegrowthLootTool\Icons\nex
 ## Notes: Guild loot biases, attendance, and player loot history.
 ## Author: Amy (Kyukon / Khamira) & SoulJuice
-## Version: 0.4
-## SavedVariables: Regrowth_Data, Regrowth_Item_Data, Regrowth_Recipes, Regrowth_Players
+## Version: 0.5
+## SavedVariables: Regrowth_Data
 
 # Libraries
 libraries.xml
@@ -12,8 +12,8 @@ libraries.xml
 # Bootstrap
 bootstrap.lua
 
-# Data objects
-Data.lua
+# Data handling
+Data/Data.lua
 
 # Helpers
 Utils/helpers.lua

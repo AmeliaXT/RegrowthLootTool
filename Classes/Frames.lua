@@ -191,7 +191,6 @@ function Frames:CreateMainUI()
     tabGroup:SetTabs(CreateTabs());
     tabGroup:SetCallback("OnGroupSelected", SelectTab);
     tabGroup:SelectTab("mainMenu");
-
     uiFrame:AddChild(tabGroup);
 
     return uiFrame;

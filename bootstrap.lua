@@ -10,9 +10,6 @@ appName, Regrowth = ...;
 
 -- Initialize Persistent Storage
 Regrowth_Data = Regrowth_Data or {};
-Regrowth_Item_Data = Regrowth_Item_Data or {};
-Regrowth_Recipes = Regrowth_Recipes or {};
-Regrowth_Players = Regrowth_Players or {};
 
 Regrowth.name = appName;
 Regrowth._initialized = false;
@@ -22,6 +19,10 @@ Regrowth.Ace = LibStub("AceAddon-3.0"):NewAddon(Regrowth.name, "AceConsole-3.0",
 
 ---@type AceGUI-3.0
 Regrowth.AceGUI = LibStub("AceGUI-3.0");
+
+Regrowth.Settings = {
+    DebugMode = "off"
+};
 
 function Regrowth:_init()
     self.Data:_init();
