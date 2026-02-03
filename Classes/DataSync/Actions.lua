@@ -18,7 +18,7 @@ local CommActions = {
 
             if Regrowth:verifyMessageSender(Message.sender) then
                 Regrowth:debug("Updating local data");
-                Regrowth.Data:UpdateLocalDataFromSync(Message.content);
+                Regrowth.Data:UpdateLocalProtectedDataFromSync(Message.content);
                 return;
             end
 
@@ -26,7 +26,7 @@ local CommActions = {
             return;
         end
 
-        Regrowth.Data:UpdateLocalRecipeDataFromSync(Message.content);
+        Regrowth.Data:UpdateLocalOpenDataFromSync(Message.content);
     end,
 };
 

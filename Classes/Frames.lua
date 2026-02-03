@@ -24,6 +24,10 @@ local function UpdateLocalData(importData)
     Regrowth.Data:UpdateLocalDataAndSaveFromImport(importData);
 end
 
+local function ValidateData(importData)
+    return Regrowth.Data.Validation:IsValidInput(importData);
+end
+
 local function CreateMainMenuTab(container)
     local mainMenuHeading = Regrowth.AceGUI:Create("Heading");
     mainMenuHeading:SetText("Regrowth Loot Tool");
@@ -75,7 +79,16 @@ local function CreateImportDataTab(container)
     local importDataBtn = importDataEb.button;
     importDataBtn:SetText("Save");
     importDataBtn:SetScript("OnClick", function()
-        UpdateLocalData(importDataEb:GetText());
+        local importData = importDataEb:GetText();
+        local jsonAsTable = Regrowth.json.decode(importData);
+
+        local isValid = ValidateData(jsonAsTable);
+
+        if not isValid then
+            error("Nex");
+        end
+
+        UpdateLocalData(jsonAsTable);
     end);
 
     container:AddChild(importDataEb);

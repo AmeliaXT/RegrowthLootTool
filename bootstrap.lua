@@ -31,8 +31,8 @@ function Regrowth:_init()
     self.User:_init();
     self.Comm:_init();
 
-    self:hookItemTooltips();
-    self:hookPlayerTooltips();
+    -- self:hookItemTooltips();
+    -- self:hookPlayerTooltips();
 end
 
 function Regrowth:bootstrap(_, _, addonName)

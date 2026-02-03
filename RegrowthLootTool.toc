@@ -13,7 +13,8 @@ libraries.xml
 bootstrap.lua
 
 # Data handling
-Data/Data.lua
+Classes/Data/Data.lua
+Classes/Data/Validation.lua
 
 # Helpers
 Utils/helpers.lua

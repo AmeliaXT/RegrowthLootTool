@@ -9,32 +9,41 @@ Regrowth.Data.Validation = Validation;
 
 local function isValidSystemSchema(systemData)
     local function isValidSystemUserSchema(systemUserData)
-        if type(systemUserData.id) ~= "number" then
+        if type(systemUserData.id) ~= "string" then
+            Regrowth:debug("1.5.1");
             return false;
         end
 
         if type(systemUserData.name) ~= "string" then
+            Regrowth:debug("1.5.2");
             return false;
         end
+
+        return true;
     end
 
     if type(systemData) ~= "table" then
+        Regrowth:debug("1.1");
         return false;
     end
 
-    if not (systemData.data_generated and systemData.user) then
+    if not (systemData.date_generated and systemData.user) then
+        Regrowth:debug("1.2");
         return false;
     end
 
-    if type(systemData.data_generated) ~= "string" then
+    if type(systemData.date_generated) ~= "string" then
+        Regrowth:debug("1.3");
         return false;
     end
 
     if type(systemData.user) ~= "table" then
+        Regrowth:debug("1.4");
         return false;
     end
 
     if not isValidSystemUserSchema(systemData.user) then
+        Regrowth:debug("1.5");
         return false;
     end
 
@@ -44,19 +53,25 @@ end
 local function isValidPrioritiesSchema(prioritiesData)
     local function isValidPrioritiesIndexSchema(prioritiesIndexData)
         if type(prioritiesIndexData.id) ~= "number" then
+            Regrowth:debug("2.2.1");
             return false;
         end
 
         if type(prioritiesIndexData.name) ~= "string" then
+            Regrowth:debug("2.2.2");
             return false;
         end
 
-        if type(prioritiesIndexData.icon) ~= "string" or type(prioritiesIndexData.icon) ~= "nil" then
+        if type(prioritiesIndexData.icon) ~= "string" and type(prioritiesIndexData.icon) ~= "nil" then
+            Regrowth:debug("2.2.3");
             return false;
         end
+
+        return true;
     end
 
     if not Regrowth:isArray(prioritiesData) then
+        Regrowth:debug("2.1");
         return false;
     end
 
@@ -66,6 +81,7 @@ local function isValidPrioritiesSchema(prioritiesData)
         idx = idx + 1;
 
         if not isValidPrioritiesIndexSchema(prioritiesData[idx]) then
+            Regrowth:debug("2.2");
             return false;
         end
     end
@@ -77,23 +93,30 @@ local function isValidItemsSchema(itemsData)
     local function isValidItemsIndexSchema(itemsIndexData)
         local function isValidItemsIndexPrioritySchema(itemsIndexPriorityData)
             if type(itemsIndexPriorityData.priority_id) ~= "number" then
+                Regrowth:debug("3.2.4.1");
                 return false;
             end
 
             if type(itemsIndexPriorityData.weight) ~= "number" then
+                Regrowth:debug("3.2.4.2");
                 return false;
             end
+
+            return true;
         end
 
         if type(itemsIndexData.item_id) ~= "number" then
+            Regrowth:debug("3.2.1");
             return false;
         end
 
-        if type(itemsIndexData.notes) ~= "string" then
+        if type(itemsIndexData.notes) ~= "string" and type(itemsIndexData.notes) ~= "nil" then
+            Regrowth:debug("3.2.2");
             return false;
         end
 
         if not Regrowth:isArray(itemsIndexData.priorities) then
+            Regrowth:debug("3.2.3");
             return false;
         end
 
@@ -103,12 +126,16 @@ local function isValidItemsSchema(itemsData)
             idx = idx + 1;
 
             if not isValidItemsIndexPrioritySchema(itemsIndexData.priorities[idx]) then
+                Regrowth:debug("3.2.4");
                 return false;
             end
         end
+
+        return true;
     end
 
     if not Regrowth:isArray(itemsData) then
+        Regrowth:debug("3.1");
         return false;
     end
 
@@ -118,6 +145,85 @@ local function isValidItemsSchema(itemsData)
         idx = idx + 1;
 
         if not isValidItemsIndexSchema(itemsData[idx]) then
+            Regrowth:debug("3.2");
+            return false;
+        end
+    end
+
+    return true;
+end
+
+local function isValidPlayersSchema(playersData)
+    local function isValidPlayersIndexSchema(playerData)
+        if type(playerData) ~= "table" then
+            Regrowth:debug("4.2.1");
+            return false;
+        end
+
+        if not (playerData.id and playerData.name and playerData.attendance) then
+            Regrowth:debug("4.2.2");
+            return false;
+        end
+
+        if type(playerData.id) ~= "number" then
+            Regrowth:debug("4.2.3");
+            return false;
+        end
+
+        if type(playerData.name) ~= "string" then
+            Regrowth:debug("4.2.4");
+            return false;
+        end
+
+        if type(playerData.attendance) ~= "table" then
+            Regrowth:debug("4.2.5");
+            return false;
+        end
+
+        if not (playerData.attendance.first_attendance and
+            playerData.attendance.attended and
+            playerData.attendance.total and
+            playerData.attendance.percentage)
+        then
+            Regrowth:debug("4.2.6");
+            return false;
+        end
+
+        if type(playerData.attendance.first_attendance) ~= "string" then
+            Regrowth:debug("4.2.7");
+            return false;
+        end
+
+        if type(playerData.attendance.attended) ~= "number" then
+            Regrowth:debug("4.2.8");
+            return false;
+        end
+
+        if type(playerData.attendance.total) ~= "number" then
+            Regrowth:debug("4.2.9");
+            return false;
+        end
+
+        if type(playerData.attendance.percentage) ~= "number" then
+            Regrowth:debug("4.2.10");
+            return false;
+        end
+
+        return true;
+    end
+
+    if not Regrowth:isArray(playersData) then
+        Regrowth:debug("4.1");
+        return false;
+    end
+
+    local idx = 0;
+
+    for _ in pairs(playersData) do
+        idx = idx + 1;
+
+        if not isValidPlayersIndexSchema(playersData[idx]) then
+            Regrowth:debug("4.2");
             return false;
         end
     end
@@ -127,22 +233,27 @@ end
 
 local function isValidSchema(inputData)
     if type(inputData) ~= "table" then
+        Regrowth:debug("0");
         return false;
     end
 
-    if not (inputData.system and inputData.priorities and inputData.items) then
+    if inputData.system and not isValidSystemSchema(inputData.system) then
+        Regrowth:debug("1");
         return false;
     end
 
-    if not isValidSystemSchema(inputData.system) then
+    if inputData.priorities and not isValidPrioritiesSchema(inputData.priorities) then
+        Regrowth:debug("2");
         return false;
     end
 
-    if not isValidPrioritiesSchema(inputData.priorities) then
+    if inputData.items and not isValidItemsSchema(inputData.items) then
+        Regrowth:debug("3");
         return false;
     end
 
-    if not isValidItemsSchema(inputData.items) then
+    if inputData.players and not isValidPlayersSchema(inputData.players) then
+        Regrowth:debug("4");
         return false;
     end
 

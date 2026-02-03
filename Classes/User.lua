@@ -17,7 +17,7 @@ local User = {
 Regrowth.User = User;
 
 local function CanReceiveUpdates()
-    if Regrowth.User.name == "Khamira" then
+    if Regrowth.User.name == "Khamira" or Regrowth.User.name == "Kyukon" then
         return true;
     end
 
@@ -43,7 +43,7 @@ local function CanReceiveUpdates()
 end
 
 local function CanSendUpdates()
-    if Regrowth.User.name == "Khamira" then
+    if Regrowth.User.name == "Khamira" or Regrowth.User.name == "Kyukon" then
         return true;
     end
 

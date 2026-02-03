@@ -1,6 +1,11 @@
 ---@type Regrowth
 local _, Regrowth = ...;
 
+local defaultData = {
+    data = {},
+    timestamp = 0,
+}
+
 ---@class RegrowthData
 ---@field Constants table
 ---@field Version string
@@ -25,26 +30,14 @@ local RegrowthData = {
         latest = "0.5",
     },
     Storage = {
-        LastUpdate = {
-            user = "",
-            timestamp = 0,
-        },
         LootCouncil = {
-            data = "Amy,Billy",
+            data = "",
             timestamp = 0,
         },
-        Items = {
-            data = {},
-            timestamp = 0,
-        },
-        Players = {
-            data = {},
-            timestamp = 0,
-        },
-        Recipes = {
-            data = {},
-            timestamp = 0,
-        },
+        System = defaultData,
+        Priorities = defaultData,
+        Items = defaultData,
+        Players = defaultData,
     }
 };
 
@@ -59,250 +52,100 @@ local function isOlderData(input, current)
     return true;
 end
 
-local function isValidInput(input, dataType)
-    if not input then
-        Regrowth:error("Input data invalid - Missing input data.")
-        return false;
+local function UpdateSystem(systemData)
+    if isOlderData(systemData.timestamp, RegrowthData.Storage.System.timestamp) then
+        Regrowth:warning("Update for 'System' skipped - Current data is newer.");
+        return;
     end
 
-    if type(input) ~= "table" then
-        Regrowth:error("Input data invalid - Invalid data type '" .. type(input) .. "'.");
-        return false;
-    end
+    Regrowth:debug("Updating 'System'...");
 
-    if not input.timestamp then
-        Regrowth:error("Input data invalid - Missing required field 'timestamp'.");
-        return false;
-    end
-
-    if not input.data then
-        Regrowth:error("Input data invalid - Missing required field 'data'.");
-        return false;
-    end
-
-    if type(input.timestamp) ~= "number" then
-        Regrowth:error("Input data invalid - Invalid 'timestamp' data type '" .. type(input.timestamp) .. "'.");
-        return false;
-    end
-
-    if type(input.data) ~= dataType then
-        Regrowth:error("Input data invalid - Invalid 'data' data type '" .. type(input.data) .. "'.");
-        return false;
-    end
-
-    return true;
+    RegrowthData.Storage.System = systemData;
 end
 
-local function isValidItemsData(items)
-    for _, itemData in ipairs(items) do
-        if not itemData or type(itemData) ~= "table" then
-            return false;
-        end
-
-        for itemId, text in pairs(itemData) do
-            if not tonumber(itemId) then
-                return false;
-            end
-
-            if type(text) ~= "string" then
-                return false;
-            end
-        end
+local function UpdatePriorities(prioritiesData)
+    if isOlderData(prioritiesData.timestamp, RegrowthData.Storage.Priorities.timestamp) then
+        Regrowth:warning("Update for 'Priorities' skipped - Current data is newer.");
+        return;
     end
 
-    return true;
+    Regrowth:debug("Updating 'Priorities'...");
+
+    RegrowthData.Storage.Priorities = prioritiesData;
 end
 
-local function TransformItemsData(items)
-    local transformed = {};
-
-    for _, itemData in ipairs(items) do
-        for itemId, itemBias in pairs(itemData) do
-            local itemIndex = tonumber(itemId);
-    
-            transformed[itemIndex] = itemBias;
-        end
-    end
-
-    return transformed;
-end
-
-local function isValidPlayersData(players)
-    for _, playerData in ipairs(players) do
-        if not playerData or type(playerData) ~= "table" then
-            return false;
-        end
-
-        for playerName, playerHistory in pairs(playerData) do
-            if type(playerName) ~= "string" then
-                return false;
-            end
-
-            for k, v in pairs(playerHistory) do
-                if k ~= "attendance" and k ~= "loot" and k ~= "last" then
-                    return false;
-                end
-
-                if k == "loot" and not tonumber(v) then
-                    return false;
-                end
-
-                if k ~= "loot" and type(v) ~= "string" then
-                    return false;
-                end
-            end
-        end
-    end
-
-    return true;
-end
-
-local function TransformPlayersData(players)
-    local transformed = {};
-
-    for _, playerData in ipairs(players) do
-        for playerName, playerHistory in pairs(playerData) do
-            transformed[playerName] = {};
-
-            for k, v in pairs(playerHistory) do
-                transformed[playerName][k] = v;
-            end
-        end
-    end
-
-    return transformed;
-end
-
-local function UpdateLootCouncil(users)
-    if not isValidInput(users, "string") then
-        return false;
-    end
-
-    if isOlderData(users.timestamp, RegrowthData.Storage.LootCouncil.timestamp) then
-        Regrowth:warning("Update for LootCouncil skipped - Current data is newer.");
-        return false;
-    end
-
-    RegrowthData.Storage.LootCouncil = users;
-    return true;
-end
-
-local function UpdateItems(items)
-    if not isValidInput(items, "table") then
-        return false;
-    end
-
-    if not isValidItemsData(items.data) then
-        Regrowth:error("Invalid 'Items' format. Expected: { \"items\": [ { \"123\": \"Warrior\" } ] }");
-        return false;
-    end
-
-    if isOlderData(items.timestamp, RegrowthData.Storage.Items.timestamp) then
+local function UpdateItems(itemsData)
+    if isOlderData(itemsData.timestamp, RegrowthData.Storage.Items.timestamp) then
         Regrowth:warning("Update for 'Items' skipped - Current data is newer.");
-        return false;
+        return;
     end
 
-    Regrowth:success("'Items' data valid. Updating...");
+    Regrowth:debug("Updating 'Items'...");
 
-    local transformedData = TransformItemsData(items.data);
-
-    RegrowthData.Storage.Items = {
-        data = transformedData,
-        timestamp = items.timestamp
-    };
-
-    return true;
+    RegrowthData.Storage.Items = itemsData;
 end
 
-local function UpdatePlayers(players)
-    if not isValidInput(players, "table") then
-        return false;
-    end
-
-    if not isValidPlayersData(players.data) then
-        Regrowth:error("Invalid 'Players' format. Expected: { \"players\": [ { \"Name\": { \"attendance\": \"50%\", \"loot\": 1, \"last\": \"01/01/2025\" } } ] }");
-        return false;
-    end
-
-    if isOlderData(players.timestamp, RegrowthData.Storage.Players.timestamp) then
+local function UpdatePlayers(playersData)
+    if isOlderData(playersData.timestamp, RegrowthData.Storage.Players.timestamp) then
         Regrowth:warning("Update for 'Players' skipped - Current data is newer.");
-        return false;
+        return;
     end
 
-    Regrowth:success("'Players' data valid. Updating...");
+    Regrowth:debug("Updating 'Players'...");
 
-    local transformedData = TransformPlayersData(players.data);
-
-    RegrowthData.Storage.Players = {
-        data = transformedData,
-        timestamp = players.timestamp
-    };
-
-    return true;
+    RegrowthData.Storage.Players = playersData;
 end
 
-local function UpdateRecipes(recipes)
-    if not isValidInput(recipes, "table") then
-        return false;
+local function UpdateLootCouncil(lootCouncilData)
+    if isOlderData(lootCouncilData.timestamp, RegrowthData.Storage.LootCouncil.timestamp) then
+        Regrowth:warning("Update for 'LootCouncil' skipped - Current data is newer.");
+        return;
     end
 
-    if not isValidItemsData(recipes.data) then
-        Regrowth:error("Invalid 'Recipes' format. Expected: { \"recipes\": [ { \"123\": \"Known By: Nex, Billy, etc.\" } ] }");
-        return false;
-    end
+    Regrowth:debug("Updating 'LootCouncil'...");
 
-    if isOlderData(recipes.timestamp, RegrowthData.Storage.Recipes.timestamp) then
-        Regrowth:warning("Update for 'Recipes' skipped - Current data is newer.");
-        return false;
-    end
-
-    Regrowth:success("'Recipes' data valid. Updating...");
-
-    local transformedData = TransformItemsData(recipes.data);
-
-    RegrowthData.Storage.Recipes = {
-        data = transformedData,
-        timestamp = recipes.timestamp
-    };
-
-    return true;
+    RegrowthData.Storage.LootCouncil = lootCouncilData;
 end
 
 local function UpdateProtectedData(newData, table)
-    if table == "LootCouncil" then
-        return UpdateLootCouncil(newData);
+    if (table == "Priorities") then
+        return UpdatePriorities(newData);
     end
 
-    if table == "Items" then
+    if (table == "Items") then
         return UpdateItems(newData);
     end
 
-    if table == "Players" then
+    if (table == "Players") then
         return UpdatePlayers(newData);
     end
 
-    return true;
+    if (table == "LootCouncil") then
+        return UpdateLootCouncil(newData);
+    end
 end
 
-local function UpdateLocalFromSync(data, table)
+local function UpdateOpenData(newData, table)
+    if (table == "System") then
+        return UpdateSystem(newData);
+    end
+end
+
+local function UpdateLocalDataFromSync(data, table)
     RegrowthData.Storage[table] = data;
 
     return RegrowthData:UpdateLocalSavedData();
 end
 
-function RegrowthData:UpdateLocalData(newData, table)
-    if type(table) ~= "string" then
-        Regrowth:error("Unable to update data. Invalid data type for table" .. type(table) .. "'.");
-        return false;
-    end
-
-    if (table ~= "LootCouncil" and
+function RegrowthData:UpdateLocalData(newData, table, timestamp)
+    if (table ~= "System" and
+        table ~= "Priorities" and
         table ~= "Items" and
         table ~= "Players" and
-        table ~= "Recipes")
+        table ~= "LootCouncil")
     then
-        Regrowth:error("Unable to update data. Invalid table '" .. table .. "'.");
-        return false;
+        Regrowth:error("Invalid table '" .. table .. "'.");
+        return;
     end
 
     local mappedData = {
@@ -310,109 +153,109 @@ function RegrowthData:UpdateLocalData(newData, table)
         timestamp = GetServerTime(),
     };
 
-    if (table == "LootCouncil" or
+    if (table == "Priorities" or
+        table == "Items" or
         table == "Players" or
-        table == "Items")
+        table == "LootCouncil")
     then
         if Regrowth.User.canReceiveUpdates then
             return UpdateProtectedData(mappedData, table);
         else
             Regrowth:error("Unable to update data. User not authorised.");
-            return false;
+            return;
         end
     end
 
-    return UpdateRecipes(mappedData);
+    return UpdateOpenData(mappedData, table);
+
+    -- return UpdateRecipes(mappedData);
 end
 
 function RegrowthData:UpdateLocalSavedData()
     if not Regrowth:isCurrentVersion() then
         Regrowth:warning("Can't update local Regrowth_Data - Version out of date.");
-        return false;
+        return;
     end
 
     Regrowth_Data = self.Storage;
-    return true;
 end
 
-function RegrowthData:UpdateLocalDataAndSave(newData, table)
+function RegrowthData:UpdateLocalDataAndSave(newData, table, timestamp)
     if not Regrowth:isCurrentVersion() then
         Regrowth:warning("Can't update local Regrowth_Data - Version out of date.");
         return;
     end
 
-    local hasUpdated = self:UpdateLocalData(newData, table);
-
-    if hasUpdated then
-        return self:UpdateLocalSavedData();
-    end
+    self:UpdateLocalData(newData, table, timestamp);
+    self:UpdateLocalSavedData();
 end
 
-function RegrowthData:UpdateLocalDataFromSync(newData)
+function RegrowthData:UpdateLocalProtectedDataFromSync(newData)
     if not Regrowth:isCurrentVersion() then
         Regrowth:warning("Can't update local Regrowth_Data - Version out of date.");
         return;
     end
 
-    -- if not RegrowthData.Validation:isValidSchema(newData) then
-    --     Regrowth:error("Input does not match expected schema.");
-    --     return;
-    -- end
+    if newData["System"] then
+        Regrowth:debug("New 'System' data received. Updating...");
+        UpdateLocalDataFromSync(newData["System"], "System");
+    end
+
+    if newData["Priorities"] then
+        Regrowth:debug("New 'Priorities' data received. Updating...");
+        UpdateLocalDataFromSync(newData["Priorities"], "Priorities");
+    end
 
     if newData["Items"] then
-        Regrowth:debug("New 'items' data received. Updating...")
-        UpdateLocalFromSync(newData["Items"], "Items");
+        Regrowth:debug("New 'Items' data received. Updating...");
+        UpdateLocalDataFromSync(newData["Items"], "Items");
     end
 
     if newData["Players"] then
-        Regrowth:debug("New 'players' data received. Updating...")
-        UpdateLocalFromSync(newData["Players"], "Players");
-    end
-
-    if newData["Recipes"] then
-        Regrowth:debug("New 'recipes' data received. Updating...")
-        UpdateLocalFromSync(newData["Recipes"], "Recipes");
+        Regrowth:debug("New 'Players' data received. Updating...");
+        UpdateLocalDataFromSync(newData["Players"], "Players");
     end
 
     if newData["LootCouncil"] then
-        Regrowth:debug("New 'lootCouncil' data received. Updating...")
-        UpdateLocalFromSync(newData["LootCouncil"], "LootCouncil");
+        Regrowth:debug("New 'LootCouncil' data received. Updating...");
+        UpdateLocalDataFromSync(newData["LootCouncil"], "LootCouncil");
     end
 end
 
-function RegrowthData:UpdateLocalRecipeDataFromSync(newData)
+function RegrowthData:UpdateLocalOpenDataFromSync(newData)
     if not Regrowth:isCurrentVersion() then
         Regrowth:warning("Can't update local Regrowth_Data - Version out of date.");
         return;
     end
 
-    if newData["Recipes"] then
-        Regrowth:debug("New 'recipes' data received. Updating...")
-        UpdateLocalFromSync(newData["Recipes"], "Recipes");
+    if newData["System"] then
+        Regrowth:debug("New 'System' data received. Updating...");
+        UpdateLocalDataFromSync(newData["System"], "System");
     end
 end
 
-function RegrowthData:UpdateLocalDataAndSaveFromImport(import)
+function RegrowthData:UpdateLocalDataAndSaveFromImport(importData)
     if not Regrowth:isCurrentVersion() then
         Regrowth:warning("Can't update local Regrowth_Data - Version out of date.");
         return;
     end
 
-    local table = Regrowth.json.decode(import);
+    local timestamp = importData.system and importData.system.date_generated or nil;
 
-    if table["items"] then
-        Regrowth:debug("New 'items' data imported. Updating...")
-        self:UpdateLocalDataAndSave(table["items"], "Items");
+    if importData.system then
+        self:UpdateLocalDataAndSave(importData.system, "System", timestamp);
     end
 
-    if table["players"] then
-        Regrowth:debug("New 'players' data imported. Updating...")
-        self:UpdateLocalDataAndSave(table["players"], "Players");
+    if importData.priorities then
+        self:UpdateLocalDataAndSave(importData.priorities, "Priorities", timestamp);
     end
 
-    if table["recipes"] then
-        Regrowth:debug("New 'recipes' data imported. Updating...")
-        self:UpdateLocalDataAndSave(table["recipes"], "Recipes");
+    if importData.items then
+        self:UpdateLocalDataAndSave(importData.items, "Items", timestamp);
+    end
+
+    if importData.players then
+        self:UpdateLocalDataAndSave(importData.players, "Players", timestamp);
     end
 end
 
@@ -428,6 +271,15 @@ function RegrowthData:_init()
     else
         Regrowth_Data = self.Storage;
     end
+
+    self.Storage.LootCouncil = self.Storage.LootCouncil or {
+        data = "",
+        timestamp = 0,
+    };
+    self.Storage.System = self.Storage.System or defaultData;
+    self.Storage.Priorities = self.Storage.Priorities or defaultData;
+    self.Storage.Items = self.Storage.Items or defaultData;
+    self.Storage.Players = self.Storage.Players or defaultData;
 
     self._initialized = true;
 end
