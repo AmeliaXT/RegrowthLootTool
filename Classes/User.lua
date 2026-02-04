@@ -67,7 +67,7 @@ function User:_init()
     self.canReceiveUpdates = CanReceiveUpdates();
 
     Regrowth:debug("User config: You " .. (self.canReceiveUpdates and "CAN" or "CAN NOT") .. " send messages.")
-    Regrowth:debug("User config: You " .. (self.canSendUpdates and "CAN" or "CAN NOT") .. " receieve messages.")
+    Regrowth:debug("User config: You " .. (self.canSendUpdates and "CAN" or "CAN NOT") .. " receive messages.")
 
     self._initialized = true;
 end
