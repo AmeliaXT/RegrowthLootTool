@@ -21,7 +21,7 @@ Regrowth.Ace = LibStub("AceAddon-3.0"):NewAddon(Regrowth.name, "AceConsole-3.0",
 Regrowth.AceGUI = LibStub("AceGUI-3.0");
 
 Regrowth.Settings = {
-    DebugMode = "on"
+    DebugMode = "off"
 };
 
 function Regrowth:_init()
