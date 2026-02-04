@@ -76,7 +76,12 @@ local function UpdateItems(itemsData)
 
     Regrowth:debug("Updating 'Items'...");
 
-    RegrowthData.Storage.Items = itemsData;
+    local transformedItemsData = RegrowthData.Transformers:TransformItemsData(itemsData.data);
+
+    RegrowthData.Storage.Items = {
+        data = transformedItemsData,
+        timestamp = itemsData.timestamp,
+    };
 end
 
 local function UpdatePlayers(playersData)
@@ -161,8 +166,6 @@ function RegrowthData:UpdateLocalData(newData, table, timestamp)
     end
 
     return UpdateOpenData(mappedData, table);
-
-    -- return UpdateRecipes(mappedData);
 end
 
 function RegrowthData:UpdateLocalSavedData()

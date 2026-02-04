@@ -14,6 +14,7 @@ bootstrap.lua
 
 # Data handling
 Classes/Data/Data.lua
+Classes/Data/Transformers.lua
 Classes/Data/Validation.lua
 
 # Helpers
@@ -24,6 +25,7 @@ Utils/json.lua
 Classes/Commands.lua
 Classes/User.lua
 Classes/Frames.lua
+Classes/Tooltips.lua
 Classes/DataSync/Comm.lua
 Classes/DataSync/Message.lua
 Classes/DataSync/Actions.lua

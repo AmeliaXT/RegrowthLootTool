@@ -128,6 +128,20 @@ function Regrowth:tableGet(Table, keyString, default)
     return self:tableGet(Table, strjoin(".", unpack(keys)), default);
 end
 
+function Regrowth:findByKeyInArray(array, key, value)
+    for _, item in ipairs(array) do
+        for k, v in pairs(item) do
+            if k == key then
+                if v == value then
+                    return item;
+                end
+            end
+        end
+    end
+
+    return nil;
+end
+
 function Regrowth:iEquals(reference, control)
     if (type(reference) ~= "string"
         or type(control) ~= "string"
