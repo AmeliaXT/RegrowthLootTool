@@ -12,8 +12,8 @@ local Commands = {
             "GUILD"
         ):send();
     end,
-    openmainui = function()
-        Regrowth.Frames:CreateMainUI();
+    togglemainui = function()
+        Regrowth.Frames:ToggleMainUIFrame();
     end,
     senddatasync = function()
         if Regrowth.User.canSendUpdates then
@@ -57,7 +57,7 @@ local function _dispatch(str)
     end
 
     if (not str or #str < 1) then
-        command = "openmainui";
+        command = "togglemainui";
     end
 
     command = string.lower(command);

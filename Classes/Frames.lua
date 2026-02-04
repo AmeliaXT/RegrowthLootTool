@@ -2,10 +2,10 @@
 local _, Regrowth = ...;
 
 ---@class Frames
----@field UIFrame string
 local Frames = {
     _initialized = false,
     UIFrame = "closed",
+    MainUIFrame = nil,
     AuthUsers = "Khamira,Kyukon"
 };
 
@@ -180,17 +180,14 @@ local function CreateCommunitiesButtonFrame()
 
     communitiesButtonFrame:SetScript("OnClick", function (_, button)
         if button == "LeftButton" then
-            if Regrowth.Frames.UIFrame == "closed" then
-                Regrowth.Frames.UIFrame = Regrowth.Frames:CreateMainUI();
-                Regrowth.Frames.UIFrame = "open";
-            end
+            Regrowth.Frames:ToggleMainUIFrame();
         end
     end);
 
     return communitiesButtonFrame;
 end
 
-function Frames:CreateMainUI()
+local function CreateMainUI()
     local uiFrame = Regrowth.AceGUI:Create("Frame");
     uiFrame:SetTitle("Regrowth Loot Tool");
     uiFrame:SetCallback("OnClose", function(widget)
@@ -206,7 +203,20 @@ function Frames:CreateMainUI()
     tabGroup:SelectTab("mainMenu");
     uiFrame:AddChild(tabGroup);
 
+    _G["RegrowthMainUIFrame"] = uiFrame.frame;
+    tinsert(UISpecialFrames, "RegrowthMainUIFrame");
+
     return uiFrame;
+end
+
+function Frames:ToggleMainUIFrame()
+    if self.UIFrame == "closed" then
+        self.MainUIFrame = CreateMainUI();
+        self.UIFrame = "open";
+    else
+        self.MainUIFrame:Hide();
+        self.UIFrame = "closed";
+    end
 end
 
 function Frames:_init()
