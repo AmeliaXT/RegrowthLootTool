@@ -38,18 +38,21 @@ local function AddRegrowthPlayerDataToTooltip(tooltip)
 
     local name = tooltip:GetUnit();
 
-    local pData = Regrowth_Data.Players.data;
+    local playerDataByName = Regrowth:findByKeyInArray(Regrowth_Data.Players.data, "name", name);
 
-    local playerData = pData[name];
-    if playerData then
-        tooltip:AddLine(" ");
-        tooltip:AddLine("Guild Raid Stats:", 0.1, 1, 0.6);
-        tooltip:AddDoubleLine("Attendance:", playerData.att or "N/A", 1, 1, 1, 1, 1, 1);
-        local lootCount = playerData.loot or 0;
-        local lastWin = playerData.last or "N/A";
-        local lootText = string.format("%d Won (%s)", lootCount, lastWin);
-        tooltip:AddDoubleLine("MS Loot:", lootText, 1, 1, 1, 1, 1, 1);
+    if not playerDataByName then
+        return;
     end
+
+    local attendance = playerDataByName.attendance.percentage and playerDataByName.attendance.percentage .. "%" or "N/A";
+
+    tooltip:AddLine(" ");
+    tooltip:AddLine("Guild Raid Stats:", 0.1, 1, 0.6);
+    tooltip:AddDoubleLine("Attendance:", attendance, 1, 1, 1, 1, 1, 1);
+    -- local lootCount = playerDataByName.loot or 0;
+    -- local lastWin = playerDataByName.last or "N/A";
+    -- local lootText = string.format("%d Won (%s)", lootCount, lastWin);
+    -- tooltip:AddDoubleLine("MS Loot:", lootText, 1, 1, 1, 1, 1, 1);
 end
 
 function Tooltips:_init()
@@ -58,7 +61,7 @@ function Tooltips:_init()
     end
 
     GameTooltip:HookScript("OnTooltipSetItem", AddRegrowthItemDataToTooltip);
-    -- GameTooltip:HookScript("OnTooltipSetUnit", AddRegrowthPlayerDataToTooltip);
+    GameTooltip:HookScript("OnTooltipSetUnit", AddRegrowthPlayerDataToTooltip);
 
     self._initialized = true;
 end
