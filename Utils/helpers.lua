@@ -41,6 +41,19 @@ function Regrowth:empty(mixed)
     return true;
 end
 
+function Regrowth:isArray(tbl)
+    local i = 0;
+
+    for _ in pairs(tbl) do
+        i = i + 1;
+        if tbl[i] == nil then
+            return false;
+        end
+    end
+
+    return true;
+end
+
 function Regrowth:getFullyQualifiedName(name, realm)
     realm = not self:empty(realm) and realm or nil;
     name = tostring(name);
@@ -115,6 +128,20 @@ function Regrowth:tableGet(Table, keyString, default)
     return self:tableGet(Table, strjoin(".", unpack(keys)), default);
 end
 
+function Regrowth:findByKeyInArray(array, key, value)
+    for _, item in ipairs(array) do
+        for k, v in pairs(item) do
+            if k == key then
+                if v == value then
+                    return item;
+                end
+            end
+        end
+    end
+
+    return nil;
+end
+
 function Regrowth:iEquals(reference, control)
     if (type(reference) ~= "string"
         or type(control) ~= "string"
@@ -179,6 +206,10 @@ function Regrowth:error(...)
 end
 
 function Regrowth:debug(...)
+    if Regrowth.Settings.DebugMode ~= "on" then
+        return;
+    end
+
     Regrowth:coloredMessage("F7922E", ...);
 end
 

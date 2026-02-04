@@ -2,9 +2,6 @@
 local _, Regrowth = ...;
 
 ---@class Comm
----@field channel string
----@field Message Message
----@field Actions Actions
 local Comm = {
     _initialized = false,
 };
@@ -12,7 +9,7 @@ local Comm = {
 ---@type Comm
 Regrowth.Comm = Comm;
 
----@type RegrowthData
+---@type Regrowth.Data
 local RegrowthData = Regrowth.Data;
 
 function Comm:_init()

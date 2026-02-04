@@ -2,10 +2,10 @@
 local _, Regrowth = ...;
 
 ---@class Frames
----@field UIFrame string
 local Frames = {
     _initialized = false,
     UIFrame = "closed",
+    MainUIFrame = nil,
     AuthUsers = "Khamira,Kyukon"
 };
 
@@ -22,6 +22,10 @@ end
 
 local function UpdateLocalData(importData)
     Regrowth.Data:UpdateLocalDataAndSaveFromImport(importData);
+end
+
+local function ValidateData(importData)
+    return Regrowth.Data.Validation:IsValidInput(importData);
 end
 
 local function CreateMainMenuTab(container)
@@ -75,7 +79,16 @@ local function CreateImportDataTab(container)
     local importDataBtn = importDataEb.button;
     importDataBtn:SetText("Save");
     importDataBtn:SetScript("OnClick", function()
-        UpdateLocalData(importDataEb:GetText());
+        local importData = importDataEb:GetText();
+        local jsonAsTable = Regrowth.json.decode(importData);
+
+        local isValid = ValidateData(jsonAsTable);
+
+        if not isValid then
+            error("Nex");
+        end
+
+        UpdateLocalData(jsonAsTable);
     end);
 
     container:AddChild(importDataEb);
@@ -167,17 +180,14 @@ local function CreateCommunitiesButtonFrame()
 
     communitiesButtonFrame:SetScript("OnClick", function (_, button)
         if button == "LeftButton" then
-            if Regrowth.Frames.UIFrame == "closed" then
-                Regrowth.Frames.UIFrame = Regrowth.Frames:CreateMainUI();
-                Regrowth.Frames.UIFrame = "open";
-            end
+            Regrowth.Frames:ToggleMainUIFrame();
         end
     end);
 
     return communitiesButtonFrame;
 end
 
-function Frames:CreateMainUI()
+local function CreateMainUI()
     local uiFrame = Regrowth.AceGUI:Create("Frame");
     uiFrame:SetTitle("Regrowth Loot Tool");
     uiFrame:SetCallback("OnClose", function(widget)
@@ -191,10 +201,22 @@ function Frames:CreateMainUI()
     tabGroup:SetTabs(CreateTabs());
     tabGroup:SetCallback("OnGroupSelected", SelectTab);
     tabGroup:SelectTab("mainMenu");
-
     uiFrame:AddChild(tabGroup);
 
+    _G["RegrowthMainUIFrame"] = uiFrame.frame;
+    tinsert(UISpecialFrames, "RegrowthMainUIFrame");
+
     return uiFrame;
+end
+
+function Frames:ToggleMainUIFrame()
+    if self.UIFrame == "closed" then
+        self.MainUIFrame = CreateMainUI();
+        self.UIFrame = "open";
+    else
+        self.MainUIFrame:Hide();
+        self.UIFrame = "closed";
+    end
 end
 
 function Frames:_init()

@@ -2,13 +2,6 @@
 local _, Regrowth = ...;
 
 ---@class Message
----@field action table
----@field channel string
----@field content any
----@field sender string
----@field senderFqn string
----@field recipient? string
----@field onResponse? function
 local Message = {};
 Message.__index = Message;
 

@@ -17,12 +17,12 @@ local User = {
 Regrowth.User = User;
 
 local function CanReceiveUpdates()
-    if Regrowth.User.name == "Khamira" then
+    if Regrowth.User.name == "Khamira" or Regrowth.User.name == "Kyukon" then
         return true;
     end
 
     local canUpdate = false;
-    local lootCouncil = Regrowth.Data.Storage.LootCouncil.data;
+    local lootCouncil = Regrowth.Data.Storage.LootCouncil.data or "";
 
     if not Regrowth:isCurrentVersion() then
         Regrowth:warning("Can't receive Regrowth_Data - Version out of date.");
@@ -43,7 +43,7 @@ local function CanReceiveUpdates()
 end
 
 local function CanSendUpdates()
-    if Regrowth.User.name == "Khamira" then
+    if Regrowth.User.name == "Khamira" or Regrowth.User.name == "Kyukon" then
         return true;
     end
 
@@ -67,7 +67,7 @@ function User:_init()
     self.canReceiveUpdates = CanReceiveUpdates();
 
     Regrowth:debug("User config: You " .. (self.canReceiveUpdates and "CAN" or "CAN NOT") .. " send messages.")
-    Regrowth:debug("User config: You " .. (self.canSendUpdates and "CAN" or "CAN NOT") .. " receieve messages.")
+    Regrowth:debug("User config: You " .. (self.canSendUpdates and "CAN" or "CAN NOT") .. " receive messages.")
 
     self._initialized = true;
 end
