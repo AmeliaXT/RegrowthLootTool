@@ -6,13 +6,7 @@ local defaultData = {
     timestamp = 0,
 }
 
----@class RegrowthData
----@field Constants table
----@field Version string
----@field LootCouncil string
----@field Items table
----@field Players table
----@field Recipes table
+---@class Regrowth.Data
 local RegrowthData = {
     _initialized = false,
     Constants = {
@@ -41,7 +35,7 @@ local RegrowthData = {
     }
 };
 
----@type RegrowthData
+---@type Regrowth.Data
 Regrowth.Data = RegrowthData;
 
 local function isOlderData(input, current)

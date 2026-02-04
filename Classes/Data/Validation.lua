@@ -1,10 +1,10 @@
 ---@type Regrowth
 local _, Regrowth = ...;
 
----@class RegrowthDataValidation
+---@class Regrowth.Data.Validation
 local Validation = {};
 
----@type RegrowthDataValidation
+---@type Regrowth.Data.Validation
 Regrowth.Data.Validation = Validation;
 
 local function isValidSystemSchema(systemData)

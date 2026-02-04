@@ -1,7 +1,7 @@
 ---@type Regrowth
 local _, Regrowth = ...;
 
----@type Data
+---@type Regrowth.Data.Constants.Actions
 local Actions = Regrowth.Data.Constants.Comm.Actions or {};
 
 ---@class Actions
