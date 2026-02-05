@@ -149,7 +149,7 @@ function RegrowthData:UpdateLocalData(newData, table, timestamp)
 
     local mappedData = {
         data = newData,
-        timestamp = GetServerTime(),
+        timestamp = timestamp or GetServerTime(),
     };
 
     if (table == "Priorities" or

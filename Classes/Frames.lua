@@ -85,7 +85,7 @@ local function CreateImportDataTab(container)
         local isValid = ValidateData(jsonAsTable);
 
         if not isValid then
-            error("Nex");
+            error("Input data does not match schema");
         end
 
         UpdateLocalData(jsonAsTable);
