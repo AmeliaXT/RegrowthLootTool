@@ -21,7 +21,7 @@ local RegrowthData = {
     },
     Version = {
         current = "0.0",
-        latest = "0.5",
+        latest = "0.5.1",
     },
     Storage = {
         LootCouncil = {
