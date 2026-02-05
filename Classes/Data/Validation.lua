@@ -32,7 +32,7 @@ local function isValidSystemSchema(systemData)
         return false;
     end
 
-    if type(systemData.date_generated) ~= "string" then
+    if type(systemData.date_generated) ~= "number" then
         Regrowth:debug("1.3");
         return false;
     end
@@ -231,6 +231,53 @@ local function isValidPlayersSchema(playersData)
     return true;
 end
 
+local function isValidCouncillorsSchema(councillorsData)
+    -- local function isValidCouncillorsIndexSchema(councillorData)
+    --     if type(councillorData) ~= "table" then
+    --         Regrowth:debug("5.2.1");
+    --         return false;
+    --     end
+
+    --     if not (councillorData.id and councillorData.name and councillorData.rank) then
+    --         Regrowth:debug("5.2.2");
+    --         return false;
+    --     end
+
+    --     if type(councillorData.id) ~= "number" then
+    --         Regrowth:debug("5.2.3");
+    --         return false;
+    --     end
+
+    --     if type(councillorData.name) ~= "string" then
+    --         Regrowth:debug("5.2.4");
+    --         return false;
+    --     end
+
+    --     if type(councillorData.rank) ~= "table" then
+    --         Regrowth:debug("5.2.5");
+    --         return false;
+    --     end
+    -- end
+
+    -- if not Regrowth:isArray(councillorsData) then
+    --     Regrowth:debug("5.1");
+    --     return false;
+    -- end
+
+    -- local idx = 0;
+
+    -- for _ in pairs(councillorsData) do
+    --     idx = idx + 1;
+
+    --     if not isValidCouncillorsIndexSchema(councillorsData[idx]) then
+    --         Regrowth:debug("5.2");
+    --         return false;
+    --     end
+    -- end
+
+    return true;
+end
+
 local function isValidSchema(inputData)
     if type(inputData) ~= "table" then
         Regrowth:debug("0");
@@ -254,6 +301,11 @@ local function isValidSchema(inputData)
 
     if inputData.players and not isValidPlayersSchema(inputData.players) then
         Regrowth:debug("4");
+        return false;
+    end
+
+    if inputData.councillors and not isValidCouncillorsSchema(inputData.councillors) then
+        Regrowth:debug("5");
         return false;
     end
 
