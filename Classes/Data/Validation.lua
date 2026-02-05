@@ -232,48 +232,48 @@ local function isValidPlayersSchema(playersData)
 end
 
 local function isValidCouncillorsSchema(councillorsData)
-    local function isValidCouncillorsIndexSchema(councillorData)
-        if type(councillorData) ~= "table" then
-            Regrowth:debug("5.2.1");
-            return false;
-        end
+    -- local function isValidCouncillorsIndexSchema(councillorData)
+    --     if type(councillorData) ~= "table" then
+    --         Regrowth:debug("5.2.1");
+    --         return false;
+    --     end
 
-        if not (councillorData.id and councillorData.name and councillorData.rank) then
-            Regrowth:debug("5.2.2");
-            return false;
-        end
+    --     if not (councillorData.id and councillorData.name and councillorData.rank) then
+    --         Regrowth:debug("5.2.2");
+    --         return false;
+    --     end
 
-        if type(councillorData.id) ~= "number" then
-            Regrowth:debug("5.2.3");
-            return false;
-        end
+    --     if type(councillorData.id) ~= "number" then
+    --         Regrowth:debug("5.2.3");
+    --         return false;
+    --     end
 
-        if type(councillorData.name) ~= "string" then
-            Regrowth:debug("5.2.4");
-            return false;
-        end
+    --     if type(councillorData.name) ~= "string" then
+    --         Regrowth:debug("5.2.4");
+    --         return false;
+    --     end
 
-        if type(councillorData.rank) ~= "table" then
-            Regrowth:debug("5.2.5");
-            return false;
-        end
-    end
+    --     if type(councillorData.rank) ~= "table" then
+    --         Regrowth:debug("5.2.5");
+    --         return false;
+    --     end
+    -- end
 
-    if not Regrowth:isArray(councillorsData) then
-        Regrowth:debug("5.1");
-        return false;
-    end
+    -- if not Regrowth:isArray(councillorsData) then
+    --     Regrowth:debug("5.1");
+    --     return false;
+    -- end
 
-    local idx = 0;
+    -- local idx = 0;
 
-    for _ in pairs(councillorsData) do
-        idx = idx + 1;
+    -- for _ in pairs(councillorsData) do
+    --     idx = idx + 1;
 
-        if not isValidCouncillorsIndexSchema(councillorsData[idx]) then
-            Regrowth:debug("5.2");
-            return false;
-        end
-    end
+    --     if not isValidCouncillorsIndexSchema(councillorsData[idx]) then
+    --         Regrowth:debug("5.2");
+    --         return false;
+    --     end
+    -- end
 
     return true;
 end
