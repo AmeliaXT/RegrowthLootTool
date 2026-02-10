@@ -12,6 +12,51 @@ Regrowth.Comm = Comm;
 ---@type Regrowth.Data
 local RegrowthData = Regrowth.Data;
 
+local function senderIsOfficer(senderGUID)
+    local rankOrder = C_GuildInfo.GetGuildRankOrder(senderGUID);
+
+    return rankOrder <= 4;
+end
+
+function Regrowth.Ace:OnCommReceived(prefix, payload, distribution, sender)
+    Regrowth:debug("HELLO");
+
+    payload = Regrowth.Comm.Message:decompress(payload);
+
+    if (not payload) then
+        return;
+    end
+
+    if (Regrowth:isSelf(payload.sender, payload.senderFqn)) then
+        return;
+    end
+
+    Regrowth:debug(payload.senderGUID);
+
+    if (not senderIsOfficer(payload.senderGUID)) then
+        Regrowth:error("Received message from non-officer GUID = " ..
+            payload.senderGUID .. " | Name = " .. payload.sender);
+        return;
+    end
+
+    payload.channel = distribution;
+
+    if (payload.senderFqn) then
+        local ciSenderFqn = strlower(strtrim(payload.senderFqn));
+        local ciPlayerName = strlower(strtrim(sender));
+
+        if (not Regrowth:strStartsWith(ciSenderFqn, ciPlayerName)) then
+            return;
+        end
+    end
+
+    if (not payload.senderFqn or not type(payload.senderFqn) == "string") then
+        return;
+    end
+
+    Comm:dispatch(Regrowth.Comm.Message.newFromReceived(payload));
+end
+
 function Comm:_init()
     if (self._initialized) then
         return;
@@ -19,11 +64,11 @@ function Comm:_init()
 
     self.channel = RegrowthData.Constants.Comm.channel;
 
-    Regrowth.Ace:RegisterComm(self.channel, Comm.listen);
+    Regrowth.Ace:RegisterComm(self.channel);
 
     self._initialized = true;
 end
-
+ 
 function Comm:send(Message, broadcastFinishedCallback, packageSentCallback)
     local compressed = Regrowth.Comm.Message:compress(Message);
 
@@ -33,35 +78,6 @@ function Comm:send(Message, broadcastFinishedCallback, packageSentCallback)
         Message.channel,
         Message.recipient
     );
-end
-
-function Comm:listen(payload, distribution, playerName)
-    payload = Regrowth.Comm.Message:decompress(payload);
-
-    if (not payload) then
-        return false;
-    end
-
-    if (Regrowth:isSelf(payload.sender, payload.senderFqn)) then
-        return false;
-    end
-
-    payload.channel = distribution;
-
-    if (payload.senderFqn) then
-        local ciSenderFqn = strlower(strtrim(payload.senderFqn));
-        local ciPlayerName = strlower(strtrim(playerName));
-
-        if (not Regrowth:strStartsWith(ciSenderFqn, ciPlayerName)) then
-            return false;
-        end
-    end
-
-    if (not payload.senderFqn or not type(payload.senderFqn) == "string") then
-        return false;
-    end
-
-    Comm:dispatch(Regrowth.Comm.Message.newFromReceived(payload));
 end
 
 function Comm:dispatch(Message)

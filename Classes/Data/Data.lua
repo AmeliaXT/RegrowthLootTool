@@ -1,8 +1,13 @@
 ---@type Regrowth
 local _, Regrowth = ...;
 
-local defaultData = {
+local defaultTabulatedData = {
     data = {},
+    timestamp = 0,
+}
+
+local defaultStringData = {
+    data = "",
     timestamp = 0,
 }
 
@@ -21,17 +26,14 @@ local RegrowthData = {
     },
     Version = {
         current = "0.0",
-        latest = "0.5.1",
+        latest = "0.6",
     },
     Storage = {
-        LootCouncil = {
-            data = "",
-            timestamp = 0,
-        },
-        System = defaultData,
-        Priorities = defaultData,
-        Items = defaultData,
-        Players = defaultData,
+        LootCouncil = defaultStringData,
+        System = defaultTabulatedData,
+        Priorities = defaultTabulatedData,
+        Items = defaultTabulatedData,
+        Players = defaultTabulatedData,
     }
 };
 
@@ -103,7 +105,12 @@ local function UpdateLootCouncil(lootCouncilData)
 
     Regrowth:debug("Updating 'LootCouncil'...");
 
-    RegrowthData.Storage.LootCouncil = lootCouncilData;
+    local transformedLootCouncilData = RegrowthData.Transformers:TransformLootCouncillors(lootCouncilData.data);
+
+    RegrowthData.Storage.LootCouncil = {
+        data = transformedLootCouncilData,
+        timestamp = lootCouncilData.timestamp
+    };
 end
 
 local function UpdateProtectedData(newData, table)
@@ -138,10 +145,10 @@ end
 
 function RegrowthData:UpdateLocalData(newData, table, timestamp)
     if (table ~= "System" and
-        table ~= "Priorities" and
-        table ~= "Items" and
-        table ~= "Players" and
-        table ~= "LootCouncil")
+            table ~= "Priorities" and
+            table ~= "Items" and
+            table ~= "Players" and
+            table ~= "LootCouncil")
     then
         Regrowth:error("Invalid table '" .. table .. "'.");
         return;
@@ -153,16 +160,11 @@ function RegrowthData:UpdateLocalData(newData, table, timestamp)
     };
 
     if (table == "Priorities" or
-        table == "Items" or
-        table == "Players" or
-        table == "LootCouncil")
+            table == "Items" or
+            table == "Players" or
+            table == "LootCouncil")
     then
-        if Regrowth.User.canReceiveUpdates then
-            return UpdateProtectedData(mappedData, table);
-        else
-            Regrowth:error("Unable to update data. User not authorised.");
-            return;
-        end
+        return UpdateProtectedData(mappedData, table);
     end
 
     return UpdateOpenData(mappedData, table);
@@ -254,6 +256,10 @@ function RegrowthData:UpdateLocalDataAndSaveFromImport(importData)
     if importData.players then
         self:UpdateLocalDataAndSave(importData.players, "Players", timestamp);
     end
+
+    if importData.councillors then
+        self:UpdateLocalDataAndSave(importData.councillors, "LootCouncil", timestamp);
+    end
 end
 
 function RegrowthData:_init()
@@ -269,14 +275,11 @@ function RegrowthData:_init()
         Regrowth_Data = self.Storage;
     end
 
-    self.Storage.LootCouncil = self.Storage.LootCouncil or {
-        data = "",
-        timestamp = 0,
-    };
-    self.Storage.System = self.Storage.System or defaultData;
-    self.Storage.Priorities = self.Storage.Priorities or defaultData;
-    self.Storage.Items = self.Storage.Items or defaultData;
-    self.Storage.Players = self.Storage.Players or defaultData;
+    self.Storage.LootCouncil = self.Storage.LootCouncil or defaultStringData;
+    self.Storage.System = self.Storage.System or defaultTabulatedData;
+    self.Storage.Priorities = self.Storage.Priorities or defaultTabulatedData;
+    self.Storage.Items = self.Storage.Items or defaultTabulatedData;
+    self.Storage.Players = self.Storage.Players or defaultTabulatedData;
 
     self._initialized = true;
 end

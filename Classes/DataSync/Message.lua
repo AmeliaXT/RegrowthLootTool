@@ -9,7 +9,7 @@ Message.__index = Message;
 Regrowth.Comm.Message = Message;
 
 setmetatable(Message, {
-    __call = function (cls, ...)
+    __call = function(cls, ...)
         return cls.new(...);
     end,
 });
@@ -25,9 +25,10 @@ function Message.new(action, content, channel, recipient, onResponse)
     self.channel = channel;
     self.sender = Regrowth.User.name;
     self.senderFqn = Regrowth.User.fqn;
+    self.senderGUID = UnitGUID("player");
     self.recipient = recipient or nil;
 
-    self.onResponse = onResponse or function () end;
+    self.onResponse = onResponse or function() end;
 
     return self;
 end
@@ -54,11 +55,12 @@ function Message:compress(unencoded)
         h = unencoded.channel,
         s = unencoded.sender,
         f = unencoded.senderFqn,
-        r = unencoded.channel ~= "WHISPER" and unencoded.recipient or nil;
+        g = unencoded.senderGUID,
+        r = unencoded.channel ~= "WHISPER" and unencoded.recipient or nil,
     };
 
     local success, encoded = pcall(
-        function ()
+        function()
             local serialized = LibSerialize:Serialize(Payload);
             local compressed = LibDeflate:CompressDeflate(serialized, { level = 5, });
             local encoded = LibDeflate:EncodeForWoWAddonChannel(compressed);
@@ -76,7 +78,7 @@ end
 
 function Message:decompress(encoded)
     local success, Payload = pcall(
-        function ()
+        function()
             local compressed = LibDeflate:DecodeForWoWAddonChannel(encoded);
             local decompressed = LibDeflate:DecompressDeflate(compressed);
             local _, deserialized = LibSerialize:Deserialize(decompressed);
@@ -84,7 +86,7 @@ function Message:decompress(encoded)
             return deserialized;
         end
     );
-    
+
     if (not success or not Payload) then
         return;
     end
@@ -99,6 +101,7 @@ function Message:decompress(encoded)
         content = Payload.c or nil,
         sender = Payload.s or nil,
         senderFqn = Payload.f or nil,
+        senderGUID = Payload.g or nil,
         recipient = Payload.r or nil,
     };
 end

@@ -58,7 +58,7 @@ local function TransformItemsDataWithPriorities(itemsData)
             itemsData[iIdx].priorities[pIdx] = mappedPriority
         end
 
-        table.sort(itemsData[iIdx].priorities, function (k1, k2)
+        table.sort(itemsData[iIdx].priorities, function(k1, k2)
             return k1.weight < k2.weight;
         end);
 
@@ -69,6 +69,24 @@ local function TransformItemsDataWithPriorities(itemsData)
     return itemsData;
 end
 
+local function TransformLootCouncilToCSL(lootCouncilData)
+    local csl = nil;
+
+    for _, lootCouncilData in ipairs(lootCouncilData) do
+        if not csl then
+            csl = lootCouncilData.name;
+        else
+            csl = csl .. ", " .. lootCouncilData.name;
+        end
+    end
+
+    return csl;
+end
+
 function Transformers:TransformItemsData(itemsData)
     return TransformItemsDataWithPriorities(itemsData);
+end
+
+function Transformers:TransformLootCouncillors(lootCouncilData)
+    return TransformLootCouncilToCSL(lootCouncilData);
 end

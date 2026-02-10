@@ -9,6 +9,12 @@
     <Script file="Libs\LibStub\LibStub.lua" />
 
     <!--
+    CallbackHandler-1.0 is a back-end utility library that makes it easy for a library to fire its
+    events to interested parties. It removes the need for addons to be aware of e.g. AceEvent.
+    -->
+    <Include file="Libs\CallbackHandler-1.0\CallbackHandler-1.0.xml" />
+
+    <!--
     AddOn development framework
 
     A basic introduction to usage can be found here:

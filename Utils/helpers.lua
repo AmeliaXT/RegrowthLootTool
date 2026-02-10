@@ -32,9 +32,9 @@ function Regrowth:empty(mixed)
     end
 
     if (varType == "function"
-        or varType == "CFunction"
-        or varType == "userdata"
-    ) then
+            or varType == "CFunction"
+            or varType == "userdata"
+        ) then
         return false;
     end
 
@@ -77,7 +77,7 @@ function Regrowth:explode(s, delimiter)
 
     -- No delimiter is provided, split all characters
     if (not delimiter) then
-        s:gsub(".",function(character) table.insert(Result, character); end);
+        s:gsub(".", function(character) table.insert(Result, character); end);
         return Result;
     end
 
@@ -90,8 +90,8 @@ end
 
 function Regrowth:tableGet(Table, keyString, default)
     if (type(keyString) ~= "string"
-        or self:empty(keyString)
-    ) then
+            or self:empty(keyString)
+        ) then
         return default;
     end
 
@@ -144,8 +144,8 @@ end
 
 function Regrowth:iEquals(reference, control)
     if (type(reference) ~= "string"
-        or type(control) ~= "string"
-    ) then
+            or type(control) ~= "string"
+        ) then
         return false
     end
 
@@ -167,18 +167,6 @@ function Regrowth:strStartsWith(str, startStr, insensitive)
     end
 
     return string.sub(str, 1, string.len(startStr)) == startStr;
-end
-
-function Regrowth:verifyMessageSender(sender)
-    local isValid = false;
-
-    for validSender in string.gmatch(Regrowth.Data.Storage.LootCouncil.data, '([^,]+)') do
-        if Regrowth:iEquals(sender, validSender) then
-            isValid = true;
-        end
-    end
-
-    return isValid;
 end
 
 function Regrowth:isCurrentVersion()
@@ -214,14 +202,14 @@ function Regrowth:debug(...)
 end
 
 function Regrowth:dump(o)
-   if type(o) == 'table' then
-      local s = '{ '
-      for k,v in pairs(o) do
-         if type(k) ~= 'number' then k = '"'..k..'"' end
-         s = s .. '['..k..'] = ' .. self.dump(v) .. ','
-      end
-      return s .. '} '
-   else
-      return tostring(o)
-   end
+    if type(o) == 'table' then
+        local s = '{ '
+        for k, v in pairs(o) do
+            if type(k) ~= 'number' then k = '"' .. k .. '"' end
+            s = s .. '[' .. k .. '] = ' .. self.dump(v) .. ','
+        end
+        return s .. '} '
+    else
+        return tostring(o)
+    end
 end

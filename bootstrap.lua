@@ -46,11 +46,11 @@ function Regrowth:bootstrap(_, _, addonName)
 
     self:_init();
 
-    Regrowth:success("Ready. Run /regrowth to start.");
+    Regrowth:success("v" .. Regrowth.Data.Version.current .. " - Ready. Run /regrowth to start.");
 
     self._initialized = true;
 end
 
 Regrowth.EventFrame = CreateFrame("FRAME", "Regrowth_EventFrame");
 Regrowth.EventFrame:RegisterEvent("ADDON_LOADED");
-Regrowth.EventFrame:SetScript("OnEvent", function (...) Regrowth:bootstrap(...); end);
+Regrowth.EventFrame:SetScript("OnEvent", function(...) Regrowth:bootstrap(...); end);

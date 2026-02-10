@@ -5,8 +5,7 @@ local _, Regrowth = ...;
 local Frames = {
     _initialized = false,
     UIFrame = "closed",
-    MainUIFrame = nil,
-    AuthUsers = "Khamira,Kyukon"
+    MainUIFrame = nil
 };
 
 ---@type Frames
@@ -57,7 +56,7 @@ local function CreateDataSyncTab(container)
     container:AddChild(desc);
 
     local syncDataBtn = Regrowth.AceGUI:Create("Button");
-    syncDataBtn:SetText("Send.");
+    syncDataBtn:SetText("Send");
     syncDataBtn:SetWidth(200);
     syncDataBtn:SetCallback("OnClick", function()
         SendDataSync();
@@ -101,7 +100,8 @@ local function CreateLootCouncilTab(container)
     container:AddChild(lootCouncilHeading);
 
     local lootCouncilLbl = Regrowth.AceGUI:Create("Label");
-    lootCouncilLbl:SetText("By default, all officers in the guild will be considered part of the loot council.\n\nOthers can be added to receive data, but will NOT be able to send data. \n\n");
+    lootCouncilLbl:SetText(
+        "By default, all officers in the guild will be considered part of the loot council.\n\nAdditional members can be added.\n\n");
     lootCouncilLbl:SetFullWidth(true);
     container:AddChild(lootCouncilLbl);
 
@@ -149,27 +149,21 @@ end
 local function CreateTabs()
     if Regrowth.User.canSendUpdates then
         return {
-            { text="Main Menu", value="mainMenu" },
-            { text="Data Sync", value="dataSync" },
-            { text="Import data", value="importData" },
-            { text="Loot Council", value="lootCouncil" },
-        };
-    end
-
-    if Regrowth.User.canReceiveUpdates then
-        return {
-            { text="Main Menu", value="mainMenu" },
-            { text="Data Sync", value="dataSync" },
+            { text = "Main Menu",    value = "mainMenu" },
+            { text = "Data Sync",    value = "dataSync" },
+            { text = "Import data",  value = "importData" },
+            { text = "Loot Council", value = "lootCouncil" },
         };
     end
 
     return {
-        { text="Main Menu", value="mainMenu" },
+        { text = "Main Menu", value = "mainMenu" },
     }
 end
 
 local function CreateCommunitiesButtonFrame()
-    local communitiesButtonFrame = CreateFrame( "Button" , "Regrowth_CommunitiesButton" , CommunitiesFrame.GuildInfoTab , "UIPanelButtonTemplate" );
+    local communitiesButtonFrame = CreateFrame("Button", "Regrowth_CommunitiesButton", CommunitiesFrame.GuildInfoTab,
+        "UIPanelButtonTemplate");
     communitiesButtonFrame.Text = communitiesButtonFrame:CreateFontString(nil, "OVERLAY", "GameFontWhiteTiny");
     communitiesButtonFrame.Text:SetPoint("CENTER", communitiesButtonFrame);
     communitiesButtonFrame.Text:SetText("");
@@ -178,7 +172,7 @@ local function CreateCommunitiesButtonFrame()
     communitiesButtonFrame:SetPoint("TOP", 2, -200);
     communitiesButtonFrame:SetNormalTexture("Interface\\AddOns\\RegrowthLootTool\\Icons\\rlt");
 
-    communitiesButtonFrame:SetScript("OnClick", function (_, button)
+    communitiesButtonFrame:SetScript("OnClick", function(_, button)
         if button == "LeftButton" then
             Regrowth.Frames:ToggleMainUIFrame();
         end
