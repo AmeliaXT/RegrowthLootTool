@@ -5,7 +5,7 @@ local RegrowthData = Regrowth.Data;
 
 ---@class Commands
 local Commands = {
-    nex = function() 
+    nex = function()
         Regrowth.Comm.Message.new(
             RegrowthData.Constants.Comm.Actions.nex,
             "Nex says hi (>^.^<)",
@@ -18,17 +18,10 @@ local Commands = {
     senddatasync = function()
         if Regrowth.User.canSendUpdates then
             local receivers = RegrowthData.Storage.LootCouncil.data;
-            Regrowth:debug("Sending data to 'OFFFICER' chat.");
-
-            local officerMessage = Regrowth.Comm.Message.new(
-                RegrowthData.Constants.Comm.Actions.handlereceiveddata,
-                Regrowth_Data,
-                "OFFICER"
-            );
-
-            officerMessage:send();
 
             for receiver in string.gmatch(receivers, '([^,]+)') do
+                receiver = receiver:gsub("%s+", "")
+
                 Regrowth:debug("Sending data to '" .. receiver .. "'.");
 
                 local message = Regrowth.Comm.Message.new(
@@ -66,7 +59,7 @@ local function _dispatch(str)
 
     args = { strsplit(" ", argumentStr, 1) };
 
-    if (command and Regrowth.Commands[command]and type(Regrowth.Commands[command]) == "function") then
+    if (command and Regrowth.Commands[command] and type(Regrowth.Commands[command]) == "function") then
         return Regrowth.Commands[command](unpack(args))
     end
 end;
@@ -75,11 +68,11 @@ end;
 Regrowth.Commands = Commands;
 
 function Commands:_init()
-    Regrowth.Ace:RegisterChatCommand("rg", function (...)
+    Regrowth.Ace:RegisterChatCommand("rg", function(...)
         return _dispatch(...);
     end);
 
-    Regrowth.Ace:RegisterChatCommand("regrowth", function (...)
+    Regrowth.Ace:RegisterChatCommand("regrowth", function(...)
         return _dispatch(...)
     end)
 end
