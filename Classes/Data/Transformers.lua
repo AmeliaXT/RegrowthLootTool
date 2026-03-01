@@ -118,17 +118,17 @@ local function FilterNewLootReceivedData(transformedData)
     local merged = {};
 
     for name, nameData in pairs(transformedData) do
-        if lrData[name] then
-            for _, data in ipairs(nameData) do
+        for _, data in ipairs(nameData) do
+            if lrData[name] then
                 if Regrowth:findByKeyInArray(lrData[name], "id", data.id) then
                     Regrowth:debug("Duplicate entry '" .. data.id .. "' found. Ignoring.");
-                else
-                    if not merged[name] then
-                        merged[name] = {};
-                    end
-
-                    table.insert(merged[name], data);
                 end
+            else
+                if not merged[name] then
+                    merged[name] = {};
+                end
+
+                table.insert(merged[name], data);
             end
         end
     end
