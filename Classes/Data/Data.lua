@@ -265,6 +265,16 @@ function RegrowthData:UpdateLocalProtectedDataFromSync(newData)
         Regrowth:debug("New 'LootCouncil' data received. Updating...");
         UpdateLocalDataFromSync(newData["LootCouncil"], "LootCouncil");
     end
+
+    if newData["LootReceived"] then
+        Regrowth:debug("New 'LootReceived' data received. Updating...");
+        UpdateLocalDataFromSync(newData["LootReceived"], "LootReceived");
+    end
+
+    if newData["Wishlists"] then
+        Regrowth:debug("New 'Wishlists' data received. Updating...");
+        UpdateLocalDataFromSync(newData["Wishlists"], "Wishlists");
+    end
 end
 
 function RegrowthData:UpdateLocalOpenDataFromSync(newData)
