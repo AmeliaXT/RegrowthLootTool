@@ -139,6 +139,10 @@ local function CreateImportDataTab(container)
         end
 
         UpdateLocalData(jsonAsTable, type);
+
+        importDataEb:ClearFocus();
+
+        Regrowth:success("Loot Council saved");
     end);
 
     container:AddChild(importDataEb);
