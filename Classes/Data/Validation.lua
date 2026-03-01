@@ -314,6 +314,26 @@ local function isValidSchema(inputData)
     return true;
 end
 
-function Validation:IsValidInput(inputData)
-    return isValidSchema(inputData);
+local function isValidRCSchema(inputData)
+    return true;
+end
+
+local function isValidWishlistsSchema(inputData)
+    return true;
+end
+
+function Validation:IsValidInput(inputData, type)
+    if type == "Website" then
+        return isValidSchema(inputData);
+    end
+
+    if type == "RCLootCouncil" then
+        return isValidRCSchema(inputData);
+    end
+
+    if type == "Wishlists" then
+        return isValidWishlistsSchema(inputData);
+    end
+
+    return false;
 end

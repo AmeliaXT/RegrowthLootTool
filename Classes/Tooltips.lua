@@ -9,7 +9,7 @@ local Tooltips = {
 ---@type Tooltips
 Regrowth.Tooltips = Tooltips;
 
-local function AddRegrowthItemDataToTooltip(tooltip)
+local function GetItemId(tooltip)
     local _, link = tooltip:GetItem();
     if not link then
         return;
@@ -20,19 +20,74 @@ local function AddRegrowthItemDataToTooltip(tooltip)
         return;
     end
 
-    local itemDataById = Regrowth:findByKeyInArray(Regrowth_Data.Items.data, "item_id", itemID);
+    return itemID;
+end
 
-    if not itemDataById then
+local function AddWishlistDataToTooltip(tooltip)
+    if not Regrowth_Config.TooltipToggles["wishlist"] and not IsInRaid() then
         return;
     end
 
-    tooltip:AddLine(" ");
-    tooltip:AddLine("Regrowth Bias:", 0.1, 1, 0.6);
-    tooltip:AddLine(itemDataById.text, 1, 1, 1, true);
+    local itemID = GetItemId(tooltip);
+
+    if not itemID then
+        return
+    end
+
+    local wanted = Regrowth:findByKeyInArray(Regrowth_Data.Wishlists.data, "itemId", itemID);
+
+    if wanted then
+        tooltip:AddLine(" ");
+        tooltip:AddLine("Wanted by:", 0.1, 1, 0.6);
+
+        local wantedBy = wanted.wantedBy;
+
+        for _, wantedData in ipairs(wantedBy) do
+            tooltip:AddLine(wantedData.name, 1, 1, 1);
+        end
+    end
+end
+
+local function AddRegrowthItemDataToTooltip(tooltip)
+    if not Regrowth_Config.TooltipToggles["bias"] and not IsInRaid() then
+        return;
+    end
+
+    local itemID = GetItemId(tooltip);
+
+    if not itemID then
+        return
+    end
+
+    local itemDataById = Regrowth:findByKeyInArray(Regrowth_Data.Items.data, "item_id", itemID);
+
+    
+    if itemDataById then
+        tooltip:AddLine(" ");
+        tooltip:AddLine("Regrowth Bias:", 0.1, 1, 0.6);
+        tooltip:AddLine(itemDataById.text, 1, 1, 1, true);
+    end
+end
+
+local function AddLootReceivedPlayerDataToTooltip(tooltip, name)
+    local receivedDataByName = Regrowth:findByKey(Regrowth_Data.LootReceived.data, name);
+
+    if not receivedDataByName then
+        return;
+    end
+
+    local lootCount = table.getn(receivedDataByName) or 0;
+    tooltip:AddDoubleLine("Total Loot:", lootCount, 0.1, 1, 0.6, 1, 1, 1);
+
+    if lootCount > 0 then
+        local lastWin = Regrowth:findByKey(receivedDataByName[1].when, "date");
+        tooltip:AddDoubleLine("Last Win:", lastWin, 0.1, 1, 0.6, 1, 1, 1);
+    end
+
 end
 
 local function AddRegrowthPlayerDataToTooltip(tooltip)
-    if not IsInRaid() then
+    if not Regrowth_Config.TooltipToggles["players"] and not IsInRaid() then
         return;
     end
 
@@ -49,10 +104,8 @@ local function AddRegrowthPlayerDataToTooltip(tooltip)
     tooltip:AddLine(" ");
     tooltip:AddLine("Guild Raid Stats:", 0.1, 1, 0.6);
     tooltip:AddDoubleLine("Attendance:", attendance, 1, 1, 1, 1, 1, 1);
-    -- local lootCount = playerDataByName.loot or 0;
-    -- local lastWin = playerDataByName.last or "N/A";
-    -- local lootText = string.format("%d Won (%s)", lootCount, lastWin);
-    -- tooltip:AddDoubleLine("MS Loot:", lootText, 1, 1, 1, 1, 1, 1);
+
+    AddLootReceivedPlayerDataToTooltip(tooltip, name);
 end
 
 function Tooltips:_init()
@@ -61,6 +114,7 @@ function Tooltips:_init()
     end
 
     GameTooltip:HookScript("OnTooltipSetItem", AddRegrowthItemDataToTooltip);
+    GameTooltip:HookScript("OnTooltipSetItem", AddWishlistDataToTooltip);
     GameTooltip:HookScript("OnTooltipSetUnit", AddRegrowthPlayerDataToTooltip);
 
     self._initialized = true;

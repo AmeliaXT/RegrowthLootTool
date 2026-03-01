@@ -26,7 +26,7 @@ local RegrowthData = {
     },
     Version = {
         current = "0.0",
-        latest = "0.6",
+        latest = "0.7",
     },
     Storage = {
         LootCouncil = defaultStringData,
@@ -34,6 +34,8 @@ local RegrowthData = {
         Priorities = defaultTabulatedData,
         Items = defaultTabulatedData,
         Players = defaultTabulatedData,
+        LootReceived = defaultTabulatedData,
+        Wishlists = defaultTabulatedData
     }
 };
 
@@ -113,6 +115,38 @@ local function UpdateLootCouncil(lootCouncilData)
     };
 end
 
+local function UpdateLootReceivedData(lootReceivedData)
+    if isOlderData(lootReceivedData.timestamp, RegrowthData.Storage.LootReceived.timestamp) then
+        Regrowth:warning("Update for 'LootReceived' skipped - Current data is newer.");
+        return;
+    end
+
+    Regrowth:debug("Updating 'LootReceived'...");
+
+    local transformedLootReceivedData = RegrowthData.Transformers:TransformedLootReceivedData(lootReceivedData.data);
+
+    RegrowthData.Storage.LootReceived = {
+        data = transformedLootReceivedData,
+        timestamp = lootReceivedData.timestamp
+    }
+end
+
+local function UpdateWishlistsData(wishlistsData)
+    if isOlderData(wishlistsData.timestamp, RegrowthData.Storage.Wishlists.timestamp) then
+        Regrowth:warning("Update for 'Wishlists' skipped - Current data is newer.");
+        return;
+    end
+
+    Regrowth:debug("Updating 'Wishlists'...");
+
+    local transformedWishlistsData = RegrowthData.Transformers:TransformWishlistsData(wishlistsData.data);
+
+    RegrowthData.Storage.Wishlists = {
+        data = transformedWishlistsData,
+        timestamp = wishlistsData.timestamp
+    }
+end
+
 local function UpdateProtectedData(newData, table)
     if (table == "Priorities") then
         return UpdatePriorities(newData);
@@ -128,6 +162,14 @@ local function UpdateProtectedData(newData, table)
 
     if (table == "LootCouncil") then
         return UpdateLootCouncil(newData);
+    end
+
+    if (table == "LootReceived") then
+        return UpdateLootReceivedData(newData);
+    end
+
+    if (table == "Wishlists") then
+        return UpdateWishlistsData(newData);
     end
 end
 
@@ -148,7 +190,9 @@ function RegrowthData:UpdateLocalData(newData, table, timestamp)
             table ~= "Priorities" and
             table ~= "Items" and
             table ~= "Players" and
-            table ~= "LootCouncil")
+            table ~= "LootCouncil" and
+            table ~= "LootReceived" and
+            table ~= "Wishlists")
     then
         Regrowth:error("Invalid table '" .. table .. "'.");
         return;
@@ -162,7 +206,9 @@ function RegrowthData:UpdateLocalData(newData, table, timestamp)
     if (table == "Priorities" or
             table == "Items" or
             table == "Players" or
-            table == "LootCouncil")
+            table == "LootCouncil" or
+            table == "LootReceived" or
+            table == "Wishlists")
     then
         return UpdateProtectedData(mappedData, table);
     end
@@ -233,7 +279,7 @@ function RegrowthData:UpdateLocalOpenDataFromSync(newData)
     end
 end
 
-function RegrowthData:UpdateLocalDataAndSaveFromImport(importData)
+function RegrowthData:UpdateLocalDataAndSaveFromImport(importData, type)
     if not Regrowth:isCurrentVersion() then
         Regrowth:warning("Can't update local Regrowth_Data - Version out of date.");
         return;
@@ -241,25 +287,47 @@ function RegrowthData:UpdateLocalDataAndSaveFromImport(importData)
 
     local timestamp = importData.system and importData.system.date_generated or nil;
 
+    if type == "Website" then
+        if importData.system then
+            self:UpdateLocalDataAndSave(importData.system, "System", timestamp);
+        end
+
+        if importData.priorities then
+            self:UpdateLocalDataAndSave(importData.priorities, "Priorities", timestamp);
+        end
+
+        if importData.items then
+            self:UpdateLocalDataAndSave(importData.items, "Items", timestamp);
+        end
+
+        if importData.players then
+            self:UpdateLocalDataAndSave(importData.players, "Players", timestamp);
+        end
+
+        if importData.councillors then
+            self:UpdateLocalDataAndSave(importData.councillors, "LootCouncil", timestamp);
+        end
+    end
+
+    if type == "RCLootCouncil" then
+        self:UpdateLocalDataAndSave(importData, "LootReceived", timestamp);
+    end
+
+    if type == "Wishlists" then
+        self:UpdateLocalDataAndSave(importData, "Wishlists", timestamp);
+    end
+end
+
+function RegrowthData:GetImportType(importData)
     if importData.system then
-        self:UpdateLocalDataAndSave(importData.system, "System", timestamp);
+        return "Website";
     end
 
-    if importData.priorities then
-        self:UpdateLocalDataAndSave(importData.priorities, "Priorities", timestamp);
+    if importData.wishlists then
+        return "Wishlists";
     end
 
-    if importData.items then
-        self:UpdateLocalDataAndSave(importData.items, "Items", timestamp);
-    end
-
-    if importData.players then
-        self:UpdateLocalDataAndSave(importData.players, "Players", timestamp);
-    end
-
-    if importData.councillors then
-        self:UpdateLocalDataAndSave(importData.councillors, "LootCouncil", timestamp);
-    end
+    return "RCLootCouncil";
 end
 
 function RegrowthData:_init()
@@ -280,6 +348,8 @@ function RegrowthData:_init()
     self.Storage.Priorities = self.Storage.Priorities or defaultTabulatedData;
     self.Storage.Items = self.Storage.Items or defaultTabulatedData;
     self.Storage.Players = self.Storage.Players or defaultTabulatedData;
+    self.Storage.LootReceived = self.Storage.LootReceived or defaultTabulatedData;
+    self.Storage.Wishlists = self.Storage.Wishlists or defaultTabulatedData;
 
     self._initialized = true;
 end

@@ -19,12 +19,20 @@ local function UpdateLocalLootCouncil(lootCouncil)
     Regrowth.Data:UpdateLocalDataAndSave(lootCouncil, "LootCouncil");
 end
 
-local function UpdateLocalData(importData)
-    Regrowth.Data:UpdateLocalDataAndSaveFromImport(importData);
+local function UpdateLocalData(importData, type)
+    Regrowth.Data:UpdateLocalDataAndSaveFromImport(importData, type);
 end
 
-local function ValidateData(importData)
-    return Regrowth.Data.Validation:IsValidInput(importData);
+local function ValidateData(importData, type)
+    return Regrowth.Data.Validation:IsValidInput(importData, type);
+end
+
+local function GetImportType(importData)
+    return Regrowth.Data:GetImportType(importData);
+end
+
+local function ToggleConfigOption(toggle)
+    Regrowth.Commands:call("toggle " .. toggle);
 end
 
 local function CreateMainMenuTab(container)
@@ -42,6 +50,47 @@ local function CreateMainMenuTab(container)
     mainMenuCredit:SetText("Addon implementation by Amy. Addon protoype and design by SoulJuice. <3");
     mainMenuCredit:SetFullWidth(true);
     container:AddChild(mainMenuCredit);
+
+    local spacer = Regrowth.AceGUI:Create("Label");
+    spacer:SetText(" ");
+    spacer:SetFullWidth(true);
+    spacer:SetHeight(10);
+    container:AddChild(spacer);
+
+    local mainMenuHeading = Regrowth.AceGUI:Create("Heading");
+    mainMenuHeading:SetText("Config");
+    mainMenuHeading:SetFullWidth(true);
+    container:AddChild(mainMenuHeading);
+
+    local itemTooltipToggle = Regrowth.AceGUI:Create("CheckBox");
+    itemTooltipToggle:SetValue(Regrowth_Config.TooltipToggles["bias"]);
+    itemTooltipToggle:SetType("checkbox");
+    itemTooltipToggle:SetLabel("Display Loot bias tooltips outside of raid.");
+    itemTooltipToggle:SetFullWidth(true);
+    itemTooltipToggle:SetCallback("OnValueChanged", function (self, e, v)
+        ToggleConfigOption("bias");
+    end);
+    container:AddChild(itemTooltipToggle);
+
+    local playerTooltipToggle = Regrowth.AceGUI:Create("CheckBox");
+    playerTooltipToggle:SetValue(Regrowth_Config.TooltipToggles["players"]);
+    playerTooltipToggle:SetType("checkbox");
+    playerTooltipToggle:SetLabel("Display Player tooltips outside of raid.");
+    playerTooltipToggle:SetFullWidth(true);
+    playerTooltipToggle:SetCallback("OnValueChanged", function (self, e, v)
+        ToggleConfigOption("players");
+    end);
+    container:AddChild(playerTooltipToggle);
+
+    local wishlistTooltipToggle = Regrowth.AceGUI:Create("CheckBox");
+    wishlistTooltipToggle:SetValue(Regrowth_Config.TooltipToggles["wishlist"]);
+    wishlistTooltipToggle:SetType("checkbox");
+    wishlistTooltipToggle:SetLabel("Display Wishlist tooltips outside of raid.");
+    wishlistTooltipToggle:SetFullWidth(true);
+    wishlistTooltipToggle:SetCallback("OnValueChanged", function (self, e, v)
+        ToggleConfigOption("wishlist");
+    end);
+    container:AddChild(wishlistTooltipToggle);
 end
 
 local function CreateDataSyncTab(container)
@@ -81,13 +130,15 @@ local function CreateImportDataTab(container)
         local importData = importDataEb:GetText();
         local jsonAsTable = Regrowth.json.decode(importData);
 
-        local isValid = ValidateData(jsonAsTable);
+        local type = GetImportType(jsonAsTable);
+
+        local isValid = ValidateData(jsonAsTable, type);
 
         if not isValid then
-            error("Input data does not match schema");
+            error("Input data does not match expected schema.");
         end
 
-        UpdateLocalData(jsonAsTable);
+        UpdateLocalData(jsonAsTable, type);
     end);
 
     container:AddChild(importDataEb);
@@ -101,9 +152,15 @@ local function CreateLootCouncilTab(container)
 
     local lootCouncilLbl = Regrowth.AceGUI:Create("Label");
     lootCouncilLbl:SetText(
-        "By default, all officers in the guild will be considered part of the loot council.\n\nAdditional members can be added.\n\n");
+        "By default, all officers in the guild will be considered part of the loot council.\n\nAdditional members can be added.");
     lootCouncilLbl:SetFullWidth(true);
     container:AddChild(lootCouncilLbl);
+
+    local spacer = Regrowth.AceGUI:Create("Label");
+    spacer:SetText(" ");
+    spacer:SetFullWidth(true);
+    spacer:SetHeight(10);
+    container:AddChild(spacer);
 
     local lootCouncilAdditionalHeading = Regrowth.AceGUI:Create("Heading");
     lootCouncilAdditionalHeading:SetText("Additional Members");
@@ -147,7 +204,7 @@ local function SelectTab(container, _, group)
 end
 
 local function CreateTabs()
-    if Regrowth.User.canSendUpdates then
+    if C_GuildInfo.IsGuildOfficer() then
         return {
             { text = "Main Menu",    value = "mainMenu" },
             { text = "Data Sync",    value = "dataSync" },

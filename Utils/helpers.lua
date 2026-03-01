@@ -72,62 +72,6 @@ function Regrowth:getFullyQualifiedName(name, realm)
     return ("%s-%s"):format(name, realm), realm;
 end
 
-function Regrowth:explode(s, delimiter)
-    local Result = {};
-
-    -- No delimiter is provided, split all characters
-    if (not delimiter) then
-        s:gsub(".", function(character) table.insert(Result, character); end);
-        return Result;
-    end
-
-    for match in (s .. delimiter):gmatch("(.-)%" .. delimiter) do
-        tinsert(Result, strtrim(match));
-    end
-
-    return Result;
-end
-
-function Regrowth:tableGet(Table, keyString, default)
-    if (type(keyString) ~= "string"
-            or self:empty(keyString)
-        ) then
-        return default;
-    end
-
-    local keys = Regrowth:explode(keyString, ".");
-    local numberOfKeys = #keys;
-    local firstKey = keys[1];
-
-    if (not numberOfKeys or not firstKey) then
-        return default;
-    end
-
-    if (type(Table) == "table") then
-        if (type(Table[firstKey]) == "nil") then
-            firstKey = tonumber(firstKey);
-
-            -- Make sure we're not looking for a numeric key instead of a string
-            if (not firstKey or type(Table[firstKey]) == "nil") then
-                return default;
-            end
-        end
-
-        Table = Table[firstKey];
-    else
-        return Table or default;
-    end
-
-    -- Changed if (#keys == 1) then to below, saved this just in case we get weird behavior
-    if (numberOfKeys == 1) then
-        default = nil;
-        return Table;
-    end
-
-    tremove(keys, 1);
-    return self:tableGet(Table, strjoin(".", unpack(keys)), default);
-end
-
 function Regrowth:findByKeyInArray(array, key, value)
     for _, item in ipairs(array) do
         for k, v in pairs(item) do
@@ -140,6 +84,32 @@ function Regrowth:findByKeyInArray(array, key, value)
     end
 
     return nil;
+end
+
+function Regrowth:findByKey(tbl, key)
+    for k, v in pairs(tbl) do
+        if key == k then
+            return v;
+        end
+    end
+
+    return nil;
+end
+
+function Regrowth:deepCopyTable(orig)
+	local originalType = type(orig)
+	local copy
+
+	if originalType == 'table' then
+		copy = {}
+		for key, value in pairs(orig) do
+			copy[key] = self:deepCopyTable(value)
+		end
+	else
+		copy = orig
+	end
+
+	return copy
 end
 
 function Regrowth:iEquals(reference, control)
@@ -186,7 +156,7 @@ function Regrowth:success(...)
 end
 
 function Regrowth:warning(...)
-    Regrowth:coloredMessage("F7922E", ...);
+    Regrowth:coloredMessage("E9D502", ...);
 end
 
 function Regrowth:error(...)

@@ -16,7 +16,7 @@ local Commands = {
         Regrowth.Frames:ToggleMainUIFrame();
     end,
     senddatasync = function()
-        if Regrowth.User.canSendUpdates then
+        if C_GuildInfo.IsGuildOfficer() then
             local receivers = RegrowthData.Storage.LootCouncil.data;
 
             for receiver in string.gmatch(receivers, '([^,]+)') do
@@ -39,7 +39,22 @@ local Commands = {
 
         Regrowth:error("You are not authorised to send data.");
     end,
+    toggle = function(type)
+        if Regrowth_Config.TooltipToggles[type] then
+            Regrowth_Config.TooltipToggles[type] = false;
+            return;
+        end
+
+        if not Regrowth_Config.TooltipToggles[type] then
+            Regrowth_Config.TooltipToggles[type] = true;
+            return;
+        end
+    end,
 };
+
+local function HookinTime()
+    Regrowth:debug("kek");
+end
 
 local function _dispatch(str)
     local command = str:match("^(%S+)");

@@ -10,6 +10,13 @@ appName, Regrowth = ...;
 
 -- Initialize Persistent Storage
 Regrowth_Data = Regrowth_Data or {};
+Regrowth_Config = Regrowth_Config or {
+    TooltipToggles = {
+        bias = false,
+        players = false,
+        wishlist = false,
+    }
+};
 
 Regrowth.name = appName;
 Regrowth._initialized = false;
@@ -53,4 +60,6 @@ end
 
 Regrowth.EventFrame = CreateFrame("FRAME", "Regrowth_EventFrame");
 Regrowth.EventFrame:RegisterEvent("ADDON_LOADED");
-Regrowth.EventFrame:SetScript("OnEvent", function(...) Regrowth:bootstrap(...); end);
+Regrowth.EventFrame:SetScript("OnEvent", function(...)
+    Regrowth:bootstrap(...);
+end);
