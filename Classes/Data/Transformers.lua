@@ -122,6 +122,8 @@ local function FilterNewLootReceivedData(transformedData)
             if lrData[name] then
                 if Regrowth:findByKeyInArray(lrData[name], "id", data.id) then
                     Regrowth:debug("Duplicate entry '" .. data.id .. "' found. Ignoring.");
+                else
+                    table.insert(merged[name], data);
                 end
             else
                 if not merged[name] then
