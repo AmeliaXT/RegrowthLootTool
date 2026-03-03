@@ -118,6 +118,10 @@ local function FilterNewLootReceivedData(transformedData)
     local merged = {};
 
     for name, nameData in pairs(transformedData) do
+        if not merged[name] then
+            merged[name] = {};
+        end
+
         for _, data in ipairs(nameData) do
             if lrData[name] then
                 if Regrowth:findByKeyInArray(lrData[name], "id", data.id) then
@@ -126,10 +130,6 @@ local function FilterNewLootReceivedData(transformedData)
                     table.insert(merged[name], data);
                 end
             else
-                if not merged[name] then
-                    merged[name] = {};
-                end
-
                 table.insert(merged[name], data);
             end
         end
